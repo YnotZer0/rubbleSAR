@@ -1,0 +1,25 @@
+// zenohd 1.9.0 router configuration for the ZBook (RubbleSAR).
+// Installed to /etc/rubblesar/zenohd.json5 by scripts/zbook/15-zenohd.sh.
+{
+  mode: "router",
+
+  // The Jetson connects here over Wi-Fi; ZBook programs connect on 127.0.0.1.
+  listen: { endpoints: ["tcp/0.0.0.0:7447"] },
+
+  // Fixed addresses only: no multicast discovery on the incident network.
+  scouting: { multicast: { enabled: false } },
+
+  // Plugins (REST admin API used by sar-doctor) are installed next to zenohd.
+  plugins_loading: { enabled: true, search_dirs: ["/usr/local/lib/zenoh"] },
+  plugins: {
+    // Read-only diagnostics on loopback only, e.g.
+    //   curl http://127.0.0.1:8447/@/*/router
+    rest: { http_port: "127.0.0.1:8447" },
+  },
+  adminspace: { enabled: true, permissions: { read: true, write: false } },
+
+  // Shared memory is only useful between processes on one machine; keep it off.
+  transport: { shared_memory: { enabled: false } },
+
+  // Field deployment: switch the listener to TLS (docs/ENVIRONMENT.md, "TLS for the field").
+}

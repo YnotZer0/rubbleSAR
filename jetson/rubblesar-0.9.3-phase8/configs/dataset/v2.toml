@@ -1,0 +1,68 @@
+# Training-set generator configuration, version 2                RubbleSAR phase 3
+#
+# Same as v1 except that the visible pieces of one victim's body part, split
+# apart by debris, are labelled as ONE object (one outline whose pieces are
+# joined by zero-area bridges, as Ultralytics does for multi-part objects).
+# v1 labelled every piece separately, which asked the model to outline slivers
+# of a few pixels as separate parts. Build and train it with:
+#   scripts/zbook/80-dataset.sh --config configs/dataset/v2.toml
+#   scripts/zbook/81-train.sh --dataset data/datasets/rubblesar-v2
+#
+# 'scenario-tool dataset --config configs/dataset/v2.toml --out data/datasets/rubblesar-v2'
+# (or scripts/zbook/80-dataset.sh) builds:
+#   images/{train,val,test}/*.jpg + labels/{train,val,test}/*.txt   Ultralytics YOLO segmentation format
+#   data.yaml, manifest.json, preview.png, test/frames/*            (full test frames for the Go evaluation)
+# Train and val come from freshly generated random scenarios; test comes from
+# the installed demo scenario and is never used for training.
+# Same file = same dataset on every run (an interrupted run resumes).
+
+[dataset]
+name = "rubblesar-v2"
+seed = 100
+tile = 640                 # model input size; frames are cut into tiles of this size (1080p -> 6 tiles)
+jpeg_quality = [82, 95]    # random JPEG quality per tile
+background_keep = 0.15     # share of tiles without body parts that are kept (hard negatives)
+min_instance_px = 6        # body-part regions smaller than this many pixels are not labelled
+simplify_px = 0.7          # outline simplification tolerance, pixels
+merge_fragments = true     # one label per visible body part (pieces joined)
+min_piece_px = 3           # with merge_fragments: pieces smaller than this are left out
+
+[split]
+train_scenarios = 30
+val_scenarios = 6
+
+[scenarios]
+# Each dataset scenario starts from this generator config (relative to this file)
+# and varies the settings below; the seed is new for every scenario.
+base_config = "../scenario/antakya-demo.toml"
+sites = [3, 4]                # collapsed buildings per scenario
+victims_per_site = [4, 7]
+start_hour = [7.5, 15.5]      # local time of day (any month), so sun height and shadows vary
+air_min_c = [-3.0, 14.0]      # overnight minimum
+air_span_c = [5.0, 14.0]      # daily range on top of the minimum
+alive_fraction = [0.5, 0.8]
+
+[frames]
+per_scenario = 80
+investigator_share = 0.5      # close to a victim
+scout_share = 0.4             # over a site; the rest: decoys and open ground
+investigator_alt_m = [10.0, 18.0]
+investigator_offset_m = 4.0   # target up to this far from the victim
+scout_alt_m = [30.0, 50.0]
+scout_offset_m = 15.0
+pitch_deg = [-90.0, -65.0]    # gimbal pitch (-90 = straight down)
+time_offset_h = [0.0, 6.0]    # hours after the scenario start (sun moves, victims move)
+noise_sigma = [1.0, 4.0]      # camera noise, grey levels
+blur_share = 0.25             # share of frames with optical blur
+blur_sigma = [0.4, 1.2]       # pixels
+
+[test]
+# Held-out frames from the installed demo scenario.
+scenario = "/var/lib/rubblesar/scenarios/antakya-demo"
+investigator_alt_m = 13.0
+scout_alt_m = 40.0
+# The drone's reported pose differs from the true pose by these errors (1 sigma),
+# so geolocation is evaluated as the drones will see it.
+gps_noise_m = 1.5
+alt_noise_m = 0.3
+yaw_noise_deg = 1.0

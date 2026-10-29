@@ -1,0 +1,95 @@
+// Control channel between the ZBook and each simulated drone.
+// Request key: sar/{incident}/uav/{uav}/control        (ZBook -> Jetson)
+// Reply key:   sar/{incident}/uav/{uav}/control/reply  (Jetson -> ZBook)
+syntax = "proto3";
+
+package sar.v1;
+
+import "sar/v1/common.proto";
+import "sar/v1/telemetry.proto";
+
+option go_package = "rubblesar/internal/sarpb;sarpb";
+
+message Control {
+  Header header = 1;
+  // Target drone; must equal the {uav} in the key expression.
+  string uav_id = 2;
+  oneof cmd {
+    Ping ping = 10;
+    SetLinkBudget set_link_budget = 11;
+    GetStatus get_status = 12;
+    RestartMission restart_mission = 13;
+    SetLinkOutage set_link_outage = 14;
+    Investigate investigate = 15;
+    CancelTask cancel_task = 16;
+  }
+}
+
+// Round-trip test. The drone answers with Pong carrying the same nonce.
+message Ping {
+  uint64 nonce = 1;
+}
+
+// Change the drone's radio budget, in bits per second. 0 means unlimited.
+// (bits rather than kbit/s so very low budgets can be tested.)
+message SetLinkBudget {
+  uint32 bps = 1;
+}
+
+message GetStatus {}
+
+// Start the drone's mission again from the beginning (phase 3 acceptance runs).
+message RestartMission {
+  // Scenario clock to restart at, seconds; negative keeps the current clock.
+  double sim_time_s = 1;
+  // Forget the tracks seen so far (new track ids from now on).
+  bool clear_tracks = 2;
+  // Discard detections still waiting for an acknowledgement.
+  bool clear_queue = 3;
+}
+
+// Simulate a radio outage: the drone sends nothing and ignores acknowledgements
+// for this many seconds, then resumes (queued detections are sent then).
+// The reply is sent before the outage starts. 0 ends an outage early.
+message SetLinkOutage {
+  uint32 seconds = 1;
+}
+
+// Phase 4: fly to a casualty, descend to alt_agl_m and hold position and
+// heading over it for hover_s seconds, watching it; then take the next task or
+// return home. A new Investigate replaces the current task (pre-emption).
+message Investigate {
+  string task_id = 1;
+  string casualty_id = 2;
+  GeoPoint target = 3;
+  float alt_agl_m = 4;
+  uint32 hover_s = 5;
+  // Parts within this distance of the target count as the casualty's.
+  float radius_m = 6;
+  uint32 priority = 7;
+}
+
+// Abandon a task (the drone returns home or resumes its survey).
+message CancelTask {
+  string task_id = 1;
+}
+
+message ControlReply {
+  Header header = 1;
+  string uav_id = 2;
+  // Header.seq of the Control message being answered.
+  uint64 in_reply_to_seq = 3;
+  bool ok = 4;
+  // Human-readable error when ok is false, prefixed with an error code.
+  string error = 5;
+  oneof body {
+    Pong pong = 10;
+    LinkStats link = 11;
+  }
+}
+
+message Pong {
+  uint64 nonce = 1;
+  // Time the drone received the Ping (drone clock).
+  int64 recv_unix_ns = 2;
+}

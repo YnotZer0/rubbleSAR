@@ -1,0 +1,164 @@
+// Casualty records (casualty-analyst on the ZBook) and investigation tasks
+// (mission-planner on the ZBook). Phase 4.
+//
+// Keys:
+//   sar/{incident}/casualty/{casualty_id}   casualty-analyst -> all, on every change
+//   sar/{incident}/casualties               casualty-analyst -> all, the full list every 10 s
+//   sar/{incident}/tasks                    mission-planner -> all, the full task list on change and every 5 s
+//
+// A casualty is one person (or one thing believed to be a person): the
+// detection reports of every drone that saw it, merged. Its status and
+// triage are provisional suggestions for a person to confirm (plan decision D9).
+syntax = "proto3";
+package sar.v1;
+import "sar/v1/common.proto";
+import "sar/v1/detection.proto";
+import "sar/v1/telemetry.proto";
+option go_package = "rubblesar/internal/sarpb;sarpb";
+
+enum CasualtyStatus {
+  CASUALTY_STATUS_UNSPECIFIED = 0;
+  // Warm, no movement during a close hover (or not yet watched: provisional).
+  CASUALTY_STATUS_WARM_UNRESPONSIVE = 1;
+  // Warm but cooling faster than the configured rate.
+  CASUALTY_STATUS_DETERIORATING = 2;
+  // Warm and moving: responsive but trapped.
+  CASUALTY_STATUS_WARM_RESPONSIVE = 3;
+  // Moving freely or self-extricating.
+  CASUALTY_STATUS_MOBILE = 4;
+  // At ambient after a close look: unconfirmed deceased.
+  CASUALTY_STATUS_NO_HEAT = 5;
+  // Temperature not readable, or cold without a close look.
+  CASUALTY_STATUS_UNKNOWN = 6;
+  // Close looks found nothing there.
+  CASUALTY_STATUS_NOT_FOUND = 7;
+}
+
+// START triage colours (provisional).
+enum Triage {
+  TRIAGE_UNSPECIFIED = 0;
+  TRIAGE_RED = 1;     // immediate
+  TRIAGE_YELLOW = 2;  // delayed
+  TRIAGE_GREEN = 3;   // minor
+  TRIAGE_BLACK = 4;   // unconfirmed deceased, kept for recovery
+  TRIAGE_GREY = 5;    // unknown: needs investigation
+}
+
+// One drone's part track merged into the casualty (its latest report).
+message CasualtyPart {
+  string uav_id = 1;
+  string track_id = 2;
+  string detection_id = 3;
+  PartClass part = 4;
+  float confidence = 5;
+  uint32 observations = 6;
+  GeoPoint position = 7;
+  float cep_m = 8;
+  float min_range_m = 9;
+}
+
+message CasualtyThermal {
+  bool readable = 1;
+  bool warm = 2;
+  // From the closest readable readings.
+  float skin_c = 3;
+  float ambient_c = 4;
+  float delta_c = 5;
+  uint32 readings = 6;
+  // Readings taken from within the close-range distance.
+  uint32 close_readings = 7;
+  // Skin temperature trend, degrees C per hour (0 when the readings span too little time).
+  float trend_c_per_h = 8;
+  float trend_span_s = 9;
+}
+
+message CasualtyMovement {
+  // Seconds watched during close hovers, over all parts.
+  float watched_s = 1;
+  bool moved = 2;
+  uint32 moved_frames = 3;
+}
+
+message Casualty {
+  Header header = 1;
+  // e.g. "C-007"; stable while the casualty exists.
+  string casualty_id = 2;
+  uint32 revision = 3;
+  GeoPoint position = 4;
+  // Circular error probable, metres.
+  float cep_m = 5;
+  repeated CasualtyPart parts = 6;
+  // Drones that saw it.
+  repeated string uav_ids = 7;
+  int64 first_seen_unix_ns = 8;
+  int64 last_seen_unix_ns = 9;
+  CasualtyThermal thermal = 10;
+  CasualtyMovement movement = 11;
+  CasualtyStatus status = 12;
+  Triage triage = 13;
+  // Triage could still change with a closer look.
+  bool provisional = 14;
+  // Why this status, in words.
+  string reason = 15;
+  // Detection confidence (several drones agreeing raise it), 0..1.
+  float confidence = 16;
+  // Estimated chance it is a living person, 0..1.
+  float p_alive = 17;
+  bool needs_investigation = 18;
+  string investigation_reason = 19;
+  // Investigations completed / close looks that found nothing.
+  uint32 investigations = 20;
+  uint32 not_found_looks = 21;
+  // Set when this casualty was merged into another one (then it is no longer listed).
+  string merged_into = 22;
+  // The detection whose crops show it best.
+  string best_detection_id = 23;
+  string summary = 24;
+  // The close look happened (an investigation hover over it).
+  bool seen_close = 25;
+}
+
+message CasualtyList {
+  Header header = 1;
+  repeated Casualty casualties = 2;
+}
+
+message TaskResult {
+  uint32 frames = 1;
+  repeated string track_ids = 2;
+  bool found = 3;
+  bool moved = 4;
+  float offset_m = 5;
+}
+
+message Task {
+  string task_id = 1;
+  string casualty_id = 2;
+  // "investigate"
+  string kind = 3;
+  // 1 most urgent (provisional Red), 2 unknown, 3 position too uncertain.
+  uint32 tier = 4;
+  string reason = 5;
+  TaskState state = 6;
+  string uav_id = 7;
+  GeoPoint target = 8;
+  float alt_agl_m = 9;
+  uint32 hover_s = 10;
+  int64 created_unix_ns = 11;
+  int64 assigned_unix_ns = 12;
+  int64 on_station_unix_ns = 13;
+  int64 finished_unix_ns = 14;
+  uint32 attempt = 15;
+  TaskResult result = 16;
+  // Why it was assigned to this drone, or why it failed/was aborted.
+  string note = 17;
+  // Distance and battery estimate at assignment.
+  float distance_m = 18;
+  float battery_needed_pct = 19;
+  float battery_pct = 20;
+}
+
+message TaskList {
+  Header header = 1;
+  repeated Task tasks = 2;
+}

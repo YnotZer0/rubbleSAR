@@ -1,0 +1,4 @@
+make: Entering directory '/home/tony/dev/rubbleSAR/16/rubblesar-0.9.4-phase8'
+go test -tags 'ort' ./internal/infer/
+ok  	rubblesar/internal/infer	0.062s
+make: Leaving directory '/home/tony/dev/rubbleSAR/16/rubblesar-0.9.4-phase8'

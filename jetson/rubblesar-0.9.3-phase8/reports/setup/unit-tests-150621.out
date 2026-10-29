@@ -1,0 +1,62 @@
+make: Entering directory '/home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8'
+go test -count=1 -timeout 45m -tags nozenoh ./...
+?   	rubblesar/cmd/casualty-analyst	[no test files]
+?   	rubblesar/cmd/edge-eye	[no test files]
+?   	rubblesar/cmd/mission-planner	[no test files]
+?   	rubblesar/cmd/rescue-dispatch	[no test files]
+?   	rubblesar/cmd/rubblesar	[no test files]
+?   	rubblesar/cmd/sar-check	[no test files]
+?   	rubblesar/cmd/sar-doctor	[no test files]
+?   	rubblesar/cmd/sar-infer	[no test files]
+?   	rubblesar/cmd/sar-monitor	[no test files]
+?   	rubblesar/cmd/sar-web	[no test files]
+?   	rubblesar/cmd/scenario-tool	[no test files]
+ok  	rubblesar/internal/aar	0.575s
+ok  	rubblesar/internal/analyst	0.218s
+ok  	rubblesar/internal/basemap	0.028s
+ok  	rubblesar/internal/bus	4.361s
+?   	rubblesar/internal/bus/zenoh	[no test files]
+ok  	rubblesar/internal/casualty	2.024s
+ok  	rubblesar/internal/check	741.757s
+?   	rubblesar/internal/cli	[no test files]
+ok  	rubblesar/internal/config	0.042s
+ok  	rubblesar/internal/cot	1.722s
+ok  	rubblesar/internal/dataset	43.367s
+ok  	rubblesar/internal/diag	0.044s
+ok  	rubblesar/internal/director	46.920s
+ok  	rubblesar/internal/dispatch	9.548s
+ok  	rubblesar/internal/doctor	0.010s
+ok  	rubblesar/internal/edge	55.753s
+ok  	rubblesar/internal/evalseg	58.572s
+ok  	rubblesar/internal/flightsim	0.207s
+ok  	rubblesar/internal/geo	0.023s
+ok  	rubblesar/internal/geom	0.046s
+ok  	rubblesar/internal/infer	0.119s
+ok  	rubblesar/internal/intake	1.123s
+ok  	rubblesar/internal/keys	0.030s
+ok  	rubblesar/internal/linkbudget	0.066s
+ok  	rubblesar/internal/live	1.122s
+?   	rubblesar/internal/logx	[no test files]
+ok  	rubblesar/internal/masks	0.181s
+ok  	rubblesar/internal/mission	0.014s
+ok  	rubblesar/internal/monitor	0.032s
+ok  	rubblesar/internal/msg	0.024s
+ok  	rubblesar/internal/obs	0.096s
+?   	rubblesar/internal/onnxgen	[no test files]
+ok  	rubblesar/internal/ops	3.273s
+ok  	rubblesar/internal/outbox	0.355s
+ok  	rubblesar/internal/perceive	131.018s
+ok  	rubblesar/internal/planner	6.600s
+ok  	rubblesar/internal/raster	0.062s
+ok  	rubblesar/internal/render	8.462s
+ok  	rubblesar/internal/roads	0.092s
+?   	rubblesar/internal/sarpb	[no test files]
+ok  	rubblesar/internal/scenario	0.247s
+ok  	rubblesar/internal/score	0.055s
+ok  	rubblesar/internal/setupscripts	1.288s
+ok  	rubblesar/internal/thermal	0.039s
+ok  	rubblesar/internal/tiles	0.110s
+ok  	rubblesar/internal/vcam	27.741s
+?   	rubblesar/internal/version	[no test files]
+ok  	rubblesar/internal/web	0.082s
+make: Leaving directory '/home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8'

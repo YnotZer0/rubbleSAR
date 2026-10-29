@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "name": "stub",
+  "arch": "stub (fixed outputs, for testing the tools)",
+  "classes": [
+    "hand",
+    "arm",
+    "leg",
+    "head",
+    "torso"
+  ],
+  "input_size": 640,
+  "onnx": "model.onnx",
+  "onnx_sha256": "779b358f939d3835f5838112b43cf8c3aeae3df2f9802f7b1f13b74b90d51062",
+  "dataset": "",
+  "epochs": 0,
+  "ultralytics_version": "",
+  "torch_version": "",
+  "gpu": "",
+  "trained_at": "",
+  "train_minutes": 0,
+  "metrics": null,
+  "notes": "NOT A TRAINED MODEL: every tile gets the same two detections"
+}

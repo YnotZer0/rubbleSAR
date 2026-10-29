@@ -1,0 +1,8 @@
+make: Entering directory '/home/tony/dev/rubbleSAR/16/rubblesar-0.9.4-phase8'
+PYTHONDONTWRITEBYTECODE=1 python3 training/tests/test_train.py
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.015s
+
+OK
+make: Leaving directory '/home/tony/dev/rubbleSAR/16/rubblesar-0.9.4-phase8'

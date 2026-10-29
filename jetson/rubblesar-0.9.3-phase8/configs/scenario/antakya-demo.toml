@@ -1,0 +1,57 @@
+# Scenario generator configuration                               RubbleSAR phase 1
+#
+# 'scenario-tool generate --config configs/scenario/antakya-demo.toml --out <dir>'
+# turns this file into <dir>/scenario.json. Same file + same seed = identical
+# scenario on every machine. Everything here is SIMULATED: no real person,
+# building collapse or casualty is represented.
+
+[scenario]
+# Must equal [site] incident_id on both machines (edge-eye.toml, sar.toml).
+id = "antakya-demo"
+name = "Antakya city centre collapse (simulated)"
+seed = 2023
+# Scenario clock zero, local time with UTC offset. A February morning:
+# cold air, low sun, so living people stand out clearly in thermal imagery
+# and sun-warmed debris starts to compete with them later in the day.
+start = "2026-02-10T09:00:00+03:00"
+
+[site]
+# Central Antakya (Hatay, Türkiye), heavily damaged in the 6 February 2023
+# earthquakes. Keep identical to [site] in edge-eye.toml and sar.toml.
+center_lat = 36.20250
+center_lon = 36.16056
+ground_alt_msl_m = 80.0
+radius_m = 805.0
+
+[environment]
+# Diurnal air temperature: minimum at 06:00, maximum at 15:00 local.
+air_min_c = 3.0
+air_max_c = 14.0
+# Extra surface heating of a fully absorbing surface with the sun overhead.
+sun_peak_gain_c = 12.0
+
+[sites]
+count = 5                 # collapsed buildings (minimum 3 for phase 1 acceptance)
+min_size_m = 18.0         # building footprint edge lengths
+max_size_m = 36.0
+max_from_centre_m = 350.0 # all sites within this distance of the centre
+min_gap_m = 30.0          # clear ground between rubble spills
+min_height_m = 2.0        # rubble pile height
+max_height_m = 6.0
+spill_m = 5.0             # rubble spreads this far beyond the footprint (blocked for routing)
+# Optional: real building outlines from OpenStreetMap, downloaded once with
+#   scenario-tool fetch-osm --config configs/scenario/antakya-demo.toml --out osm-antakya.json
+# then set the path here (relative to this file or absolute). Empty = procedural sites.
+osm_buildings = ""
+
+[victims]
+per_site_min = 4          # 5 sites x 4..6 = 20..30 victims
+per_site_max = 6
+alive_fraction = 0.65     # the rest are deceased
+responsive_fraction = 0.5 # of the living: moving / responsive
+deteriorating_fraction = 0.2 # of the living: cooling over time (the remainder: unresponsive)
+min_spacing_m = 3.0
+
+[render]
+gsd_m = 0.015             # layer resolution, metres per pixel (1.5 cm)
+margin_m = 6.0            # rendered border around each footprint

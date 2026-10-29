@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RubbleSAR operator view</title>
+<link rel="stylesheet" href="app.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='2' fill='none' stroke='%231f5fd1' stroke-width='3'/%3E%3Cpath d='M8 8 24 24M24 8 8 24' stroke='%231f5fd1' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/" title="RubbleSAR: maps and after-action reports">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="2"/><path d="M8 8 24 24M24 8 8 24"/></svg>
+    <span class="name">RubbleSAR</span>
+  </a>
+  <div class="incident" id="incident">Operator view</div>
+  <div class="situation" id="situation" aria-live="polite"></div>
+  <div class="status">
+    <span class="mode" id="mode">connecting</span>
+    <span class="clock" id="clock"></span>
+    <button class="ghost" id="theme" type="button" title="Switch between the light and the dark look">Dark</button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="found" id="found" aria-labelledby="h-found">
+    <div class="found-head">
+      <h2 id="h-found">What the drones found</h2>
+      <p class="found-sum" id="foundsum"></p>
+    </div>
+    <div class="latest-head"><h3>Latest reports</h3><span class="sub" id="repsum"></span></div>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section class="mapwrap" aria-label="Incident map">
+    <canvas id="map" tabindex="0" aria-label="Map of the incident: drones, casualties, rescue teams and their routes. Drag to move, scroll to zoom."></canvas>
+    <div class="tape" id="tape" aria-hidden="true"></div>
+    <div class="legend" id="legend"></div>
+    <div class="mapctl">
+      <button type="button" id="zin" title="Zoom in">+</button>
+      <button type="button" id="zout" title="Zoom out">−</button>
+      <button type="button" id="zfit" title="Show everything">Fit</button>
+    </div>
+    <div class="tip" id="tip" hidden></div>
+    <div class="slate" id="slate" hidden></div>
+  </section>
+
+  <aside class="side" id="side">
+    <section class="block cas" aria-labelledby="h-cas">
+      <h2 id="h-cas">Casualties</h2>
+      <div class="list" id="cas"></div>
+    </section>
+    <section class="block" aria-labelledby="h-drones">
+      <h2 id="h-drones">Drones</h2>
+      <div class="list" id="drones"></div>
+    </section>
+    <section class="block" aria-labelledby="h-teams">
+      <h2 id="h-teams">Rescue teams</h2>
+      <div class="list" id="teams"></div>
+    </section>
+    <div class="detail" id="detail" hidden></div>
+  </aside>
+
+  <section class="panel" id="panel" hidden aria-live="polite"></section>
+  <div class="card-over" id="card" hidden></div>
+
+  <section class="lower" id="lower">
+    <div class="tabs" id="tabs" role="tablist" aria-label="More about the incident" hidden></div>
+    <section class="block feed" aria-labelledby="h-time">
+      <h2 id="h-time">What happened</h2>
+      <ol class="timeline" id="timeline"></ol>
+    </section>
+    <section class="block chat" aria-labelledby="h-chat">
+      <h2 id="h-chat">Chat with the teams</h2>
+      <ol class="chatlog" id="chat"></ol>
+    </section>
+  </section>
+
+  <section class="caption" id="caption" hidden>
+    <div class="cap-head"><span class="cap-title" id="capTitle"></span><span class="cap-clock" id="capClock"></span></div>
+    <p class="cap-text" id="capText"></p>
+    <div class="cap-progress" id="capProgress"></div>
+  </section>
+</main>
+<noscript>The operator view needs JavaScript.</noscript>
+<script src="app.js"></script>
+</body>
+</html>

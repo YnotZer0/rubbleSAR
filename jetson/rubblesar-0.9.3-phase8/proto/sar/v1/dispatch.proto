@@ -1,0 +1,132 @@
+// Rescue team dispatch (rescue-dispatch on the ZBook). Phase 5.
+//
+// Key:
+//   sar/{incident}/dispatch   rescue-dispatch -> all, on change and every 5 s
+//
+// rescue-dispatch sends the nearest free rescue team to each casualty that
+// needs one (Red first, then Yellow), along streets clear of rubble, and
+// shows everything on the TAK map (taky). Teams are simulated, or real TAK
+// users whose callsigns are listed in [dispatch] team.
+syntax = "proto3";
+package sar.v1;
+import "sar/v1/common.proto";
+import "sar/v1/casualty.proto";
+option go_package = "rubblesar/internal/sarpb;sarpb";
+
+enum TeamState {
+  TEAM_STATE_UNSPECIFIED = 0;
+  TEAM_STATE_IDLE = 1;      // free for an assignment
+  TEAM_STATE_EN_ROUTE = 2;  // travelling to its casualty
+  TEAM_STATE_ON_SCENE = 3;  // with its casualty
+  TEAM_STATE_OFFLINE = 4;   // a TAK team with no recent position
+}
+
+enum AssignmentState {
+  ASSIGNMENT_STATE_UNSPECIFIED = 0;
+  ASSIGNMENT_STATE_EN_ROUTE = 1;
+  // The team reached the casualty (within arrive_m).
+  ASSIGNMENT_STATE_ON_SCENE = 2;
+  // The team finished there (on_scene elapsed, or the team said "done").
+  ASSIGNMENT_STATE_DONE = 3;
+  // Withdrawn: triage changed, record merged, the team went offline or said "unable".
+  ASSIGNMENT_STATE_CANCELLED = 4;
+}
+
+message Team {
+  string team_id = 1;
+  string callsign = 2;
+  // "foot" or "vehicle".
+  string mode = 3;
+  // "sim" (moved by rescue-dispatch) or "tak" (a TAK user's position).
+  string source = 4;
+  TeamState state = 5;
+  GeoPoint position = 6;
+  float course_deg = 7;
+  float speed_mps = 8;
+  string assignment_id = 9;
+  string casualty_id = 10;
+  int64 last_seen_unix_ns = 11;
+  // TAK uid of a real team (for direct messages).
+  string tak_uid = 12;
+  uint32 assignments_done = 13;
+}
+
+message RoutePlan {
+  string mode = 1;
+  // From the team to the casualty; points[access_index] is where the street part ends.
+  repeated GeoPoint points = 2;
+  uint32 access_index = 3;
+  float length_m = 4;
+  float road_m = 5;
+  float off_road_m = 6;
+  float rubble_m = 7;
+  float eta_s = 8;
+  float direct_m = 9;
+  repeated string streets = 10;
+}
+
+message Assignment {
+  string assignment_id = 1;
+  string casualty_id = 2;
+  string team_id = 3;
+  AssignmentState state = 4;
+  // Triage when assigned (and now).
+  Triage triage = 5;
+  bool provisional = 6;
+  Triage triage_now = 7;
+  // 1 Red (settled), 2 Red (provisional), 3 Yellow.
+  uint32 priority = 8;
+  GeoPoint target = 9;
+  RoutePlan route = 10;
+  int64 created_unix_ns = 11;
+  int64 on_scene_unix_ns = 12;
+  int64 done_unix_ns = 13;
+  // When the casualty first needed a team (Red or Yellow).
+  int64 needed_unix_ns = 14;
+  string note = 15;
+  // Teams that were free when it was assigned, and the chosen team's ETA rank.
+  uint32 free_teams = 16;
+  // Once on scene: the time to free the casualty from the rubble and hand
+  // them over, in real seconds (simulated teams take it rescue_time_scale
+  // times faster), and why ("heavy rescue: pancake collapse under 2.6 m...").
+  float extrication_s = 17;
+  string extrication = 18;
+  // When the team on scene expects to be free again (wall clock).
+  int64 free_unix_ns = 19;
+}
+
+message RoadsInfo {
+  // "osm" or "synthetic"; empty when no street file is loaded.
+  string source = 1;
+  string path = 2;
+  uint32 ways = 3;
+  uint32 edges = 4;
+  uint32 blocked_edges = 5;
+  uint32 blockages = 6;
+  float length_km = 7;
+}
+
+message TakLink {
+  string server = 1;
+  bool connected = 2;
+  uint64 sent = 3;
+  uint64 received = 4;
+  uint32 reconnects = 5;
+  string last_error = 6;
+  // TAK users seen (callsigns), teams or not.
+  repeated string users = 7;
+}
+
+message DispatchState {
+  Header header = 1;
+  repeated Team teams = 2;
+  repeated Assignment assignments = 3;
+  // Casualties that need a team but have none yet, most urgent first.
+  repeated string waiting = 4;
+  RoadsInfo roads = 5;
+  TakLink tak = 6;
+  // Simulated teams move this many times faster than real time.
+  float time_scale = 7;
+  // Run token (changes on reset).
+  string run = 8;
+}

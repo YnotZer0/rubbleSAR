@@ -1,0 +1,55 @@
+
+==> Checking sudo access (you may be asked for your password)
+    ok: sudo available
+
+==> Service account 'rubblesar'
+    ok: exists
+
+==> Installing binaries to /opt/rubblesar/bin
+    ok: edge-eye 0.9.3-phase8 (phase 8, commit 259771dd3b, built 2026-10-21T15:06:00Z, go1.26.0 linux/arm64, zenoh-c 1.9.0)
+
+==> Configuration in /etc/rubblesar
+    WARNING: kept your existing /etc/rubblesar/edge-eye.toml; the release default is in /etc/rubblesar/edge-eye.toml.new (use --force-config to replace)
+    ok: SAR_ZENOH_CONNECT=tcp/192.168.0.213:7447 in /etc/rubblesar/edge-eye.env
+    OK: /etc/rubblesar/edge-eye.toml
+      incident antakya-demo at 36.20250,36.16056 radius 805 m
+      zenoh client -> tcp/192.168.0.213:7447
+      admin 127.0.0.1:9101
+      drone scout-1  scout        survey  40 m AGL, 1.0 Hz telemetry, budget 256 kbps, survey all sites at 5.0 m/s, camera 1.0 Hz
+      drone inv-1    investigator standby  15 m AGL, 1.0 Hz telemetry, budget 256 kbps, waits at home for tasks (flies at 10 m/s), camera 1.0 Hz
+      drone inv-2    investigator standby  15 m AGL, 1.0 Hz telemetry, budget 256 kbps, waits at home for tasks (flies at 10 m/s), camera 1.0 Hz
+      perception: detector model, model /var/lib/rubblesar/models/current, confidence 0.25, skin band 20..40 C (+3 C), queue /var/lib/rubblesar/edge/queue (200 MB)
+      positions: on a surface 2.5 m above the ground, detection error 1.0 m added to the CEP; hovering: movement when 12% of an outline shifts more than 2 px in 2 frames
+
+==> GPU access for the service account (phase 3: the model runs inside edge-eye)
+    ok: rubblesar is in group render (GPU device files)
+    ok: rubblesar is in group video (GPU device files)
+    ok: the model loads on the GPU as the service runs it: tensorrt 10.3.0 on Orin
+
+==> Time synchronisation from the ZBook (chrony)
+    ok: chrony will follow the ZBook (192.168.0.213) once it serves time (scripts/zbook/30-install.sh)
+
+==> Reaching the ZBook's zenoh router
+    ok: TCP 192.168.0.213:7447 reachable
+
+==> systemd service edge-eye
+    waiting for edge-eye to report healthy (connected to the ZBook)...
+    ok: edge-eye is running and connected
+    edge-eye 0.9.3-phase8 (phase 8, commit 259771dd3b, built 2026-10-21T15:06:00Z, go1.26.0 linux/arm64, zenoh-c 1.9.0)
+    state: running   up 1s
+    incident antakya-demo   bus zenoh 1.9.0 client tcp/192.168.0.213:7447
+    
+    UAV      ROLE         PHASE           LAT        LON   AGL  BATT       BUDGET   USED(5s) DROPPED PUBLISHED ERRORS
+    scout-1  scout        takeoff    36.20025   36.15998    0m  100%   256000 b/s    531 b/s       0         1      0
+    inv-1    investigator landed     36.20021   36.16023    0m  100%   256000 b/s    420 b/s       0         1      0
+    inv-2    investigator landed     36.20025   36.16048    0m  100%   256000 b/s    420 b/s       0         1      0
+    
+    UAV      MISSION       FRAMES    FPS  PIPE(ms)   RENDER  TRACKS REPORTS   QUEUED  UNACK  ACKED  LEVEL LINK
+    scout-1  0/10               0   0.00         0        0       0       0        0      0      0      0 ok
+    inv-1    -                  0   0.00         0        0       0       0        0      0      0      0 ok
+    inv-2    -                  0   0.00         0        0       0       0        0      0      0      0 ok
+    perception: tensorrt 10.3.0 on Orin
+
+DONE: scripts/jetson/30-install.sh completed successfully.
+Log: /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8/reports/setup/jetson-30-install-20261021T152604Z.log
+Next: scripts/jetson/90-phase4-test.sh (phase 4), or scripts/jetson/40-test.sh (phase 0 checks)

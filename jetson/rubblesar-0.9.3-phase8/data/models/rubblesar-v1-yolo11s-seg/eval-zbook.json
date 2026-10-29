@@ -1,0 +1,1168 @@
+{
+  "scenario": "antakya-demo",
+  "backend": "onnxruntime-cpu 1.22.0",
+  "frames": 71,
+  "options": {
+    "MinTruthPx": 6,
+    "StrictIoU": 0.5,
+    "LenientIoU": 0.25,
+    "LenientPx": 4,
+    "Overlays": "/home/tony/dev/rubbleSAR/3/rubblesar-0.3.0-phase2/data/overlays/rubblesar-v1-yolo11s-seg",
+    "OverlayMax": 2
+  },
+  "classes": [
+    {
+      "class": "hand",
+      "truth": 217,
+      "detections": 89,
+      "tp": 55,
+      "fp": 34,
+      "fn": 162,
+      "precision": 0.618,
+      "recall": 0.253,
+      "mask_ap50": 0.245,
+      "tp_lenient": 75,
+      "precision_lenient": 0.843,
+      "recall_lenient": 0.346
+    },
+    {
+      "class": "arm",
+      "truth": 209,
+      "detections": 94,
+      "tp": 68,
+      "fp": 26,
+      "fn": 141,
+      "precision": 0.723,
+      "recall": 0.325,
+      "mask_ap50": 0.313,
+      "tp_lenient": 85,
+      "precision_lenient": 0.904,
+      "recall_lenient": 0.407
+    },
+    {
+      "class": "leg",
+      "truth": 98,
+      "detections": 71,
+      "tp": 38,
+      "fp": 33,
+      "fn": 60,
+      "precision": 0.535,
+      "recall": 0.388,
+      "mask_ap50": 0.337,
+      "tp_lenient": 56,
+      "precision_lenient": 0.789,
+      "recall_lenient": 0.571
+    },
+    {
+      "class": "head",
+      "truth": 40,
+      "detections": 28,
+      "tp": 21,
+      "fp": 7,
+      "fn": 19,
+      "precision": 0.75,
+      "recall": 0.525,
+      "mask_ap50": 0.498,
+      "tp_lenient": 25,
+      "precision_lenient": 0.893,
+      "recall_lenient": 0.625
+    },
+    {
+      "class": "torso",
+      "truth": 63,
+      "detections": 54,
+      "tp": 40,
+      "fp": 14,
+      "fn": 23,
+      "precision": 0.741,
+      "recall": 0.635,
+      "mask_ap50": 0.582,
+      "tp_lenient": 46,
+      "precision_lenient": 0.852,
+      "recall_lenient": 0.73
+    }
+  ],
+  "overall": {
+    "class": "all",
+    "truth": 627,
+    "detections": 336,
+    "tp": 222,
+    "fp": 114,
+    "fn": 405,
+    "precision": 0.661,
+    "recall": 0.354,
+    "mask_ap50": 0.395,
+    "tp_lenient": 287,
+    "precision_lenient": 0.854,
+    "recall_lenient": 0.458
+  },
+  "kinds": [
+    {
+      "kind": "investigator-nadir",
+      "frames": 23,
+      "truth": 172,
+      "detections": 126,
+      "tp": 92,
+      "tp_lenient": 112,
+      "precision": 0.73,
+      "recall": 0.535,
+      "recall_lenient": 0.651,
+      "false_alarms_per_frame": 0.61
+    },
+    {
+      "kind": "investigator-oblique",
+      "frames": 23,
+      "truth": 212,
+      "detections": 137,
+      "tp": 90,
+      "tp_lenient": 110,
+      "precision": 0.657,
+      "recall": 0.425,
+      "recall_lenient": 0.519,
+      "false_alarms_per_frame": 1.17
+    },
+    {
+      "kind": "scout-nadir",
+      "frames": 20,
+      "truth": 199,
+      "detections": 63,
+      "tp": 33,
+      "tp_lenient": 56,
+      "precision": 0.524,
+      "recall": 0.166,
+      "recall_lenient": 0.281,
+      "false_alarms_per_frame": 0.35
+    },
+    {
+      "kind": "scout-oblique",
+      "frames": 5,
+      "truth": 44,
+      "detections": 10,
+      "tp": 7,
+      "tp_lenient": 9,
+      "precision": 0.7,
+      "recall": 0.159,
+      "recall_lenient": 0.205,
+      "false_alarms_per_frame": 0.2
+    }
+  ],
+  "geolocation_reported_pose": {
+    "radius_m": 2,
+    "min_truth_area_m2": 0.004,
+    "classes": [
+      {
+        "class": "hand",
+        "truth": 18,
+        "detections": 89,
+        "tp": 15,
+        "fp": 41,
+        "fn": 3,
+        "duplicates": 33,
+        "ignored": 0,
+        "precision": 0.268,
+        "recall": 0.833
+      },
+      {
+        "class": "arm",
+        "truth": 15,
+        "detections": 94,
+        "tp": 14,
+        "fp": 33,
+        "fn": 1,
+        "duplicates": 47,
+        "ignored": 0,
+        "precision": 0.298,
+        "recall": 0.933
+      },
+      {
+        "class": "leg",
+        "truth": 6,
+        "detections": 71,
+        "tp": 4,
+        "fp": 36,
+        "fn": 2,
+        "duplicates": 31,
+        "ignored": 0,
+        "precision": 0.1,
+        "recall": 0.667
+      },
+      {
+        "class": "head",
+        "truth": 4,
+        "detections": 28,
+        "tp": 4,
+        "fp": 12,
+        "fn": 0,
+        "duplicates": 12,
+        "ignored": 0,
+        "precision": 0.25,
+        "recall": 1
+      },
+      {
+        "class": "torso",
+        "truth": 5,
+        "detections": 54,
+        "tp": 5,
+        "fp": 20,
+        "fn": 0,
+        "duplicates": 29,
+        "ignored": 0,
+        "precision": 0.2,
+        "recall": 1
+      }
+    ],
+    "overall": {
+      "class": "all",
+      "truth": 48,
+      "detections": 336,
+      "tp": 42,
+      "fp": 142,
+      "fn": 6,
+      "duplicates": 152,
+      "ignored": 0,
+      "precision": 0.228,
+      "recall": 0.875
+    },
+    "victims_total": 23,
+    "victims_found": 19,
+    "victims_missed": [
+      "v14",
+      "v18",
+      "v20",
+      "v23"
+    ],
+    "geoloc_error_mean_m": 0.826,
+    "geoloc_error_median_m": 0.661,
+    "geoloc_error_p95_m": 1.718,
+    "geoloc_error_max_m": 1.754,
+    "matches": [
+      {
+        "det": 62,
+        "victim": 2,
+        "victim_id": "v02",
+        "class": "torso",
+        "error_m": 0.18
+      },
+      {
+        "det": 272,
+        "victim": 2,
+        "victim_id": "v02",
+        "class": "arm",
+        "error_m": 0.213
+      },
+      {
+        "det": 323,
+        "victim": 17,
+        "victim_id": "v17",
+        "class": "head",
+        "error_m": 0.253
+      },
+      {
+        "det": 321,
+        "victim": 17,
+        "victim_id": "v17",
+        "class": "torso",
+        "error_m": 0.271
+      },
+      {
+        "det": 32,
+        "victim": 3,
+        "victim_id": "v03",
+        "class": "hand",
+        "error_m": 0.292
+      },
+      {
+        "det": 31,
+        "victim": 3,
+        "victim_id": "v03",
+        "class": "arm",
+        "error_m": 0.298
+      },
+      {
+        "det": 268,
+        "victim": 4,
+        "victim_id": "v04",
+        "class": "arm",
+        "error_m": 0.299
+      },
+      {
+        "det": 270,
+        "victim": 4,
+        "victim_id": "v04",
+        "class": "hand",
+        "error_m": 0.3
+      },
+      {
+        "det": 297,
+        "victim": 10,
+        "victim_id": "v10",
+        "class": "torso",
+        "error_m": 0.313
+      },
+      {
+        "det": 322,
+        "victim": 16,
+        "victim_id": "v16",
+        "class": "hand",
+        "error_m": 0.335
+      },
+      {
+        "det": 300,
+        "victim": 10,
+        "victim_id": "v10",
+        "class": "head",
+        "error_m": 0.35
+      },
+      {
+        "det": 4,
+        "victim": 1,
+        "victim_id": "v01",
+        "class": "arm",
+        "error_m": 0.367
+      },
+      {
+        "det": 103,
+        "victim": 9,
+        "victim_id": "v09",
+        "class": "head",
+        "error_m": 0.382
+      },
+      {
+        "det": 67,
+        "victim": 2,
+        "victim_id": "v02",
+        "class": "hand",
+        "error_m": 0.395
+      },
+      {
+        "det": 29,
+        "victim": 3,
+        "victim_id": "v03",
+        "class": "torso",
+        "error_m": 0.405
+      },
+      {
+        "det": 104,
+        "victim": 6,
+        "victim_id": "v06",
+        "class": "hand",
+        "error_m": 0.406
+      },
+      {
+        "det": 105,
+        "victim": 6,
+        "victim_id": "v06",
+        "class": "arm",
+        "error_m": 0.422
+      },
+      {
+        "det": 184,
+        "victim": 17,
+        "victim_id": "v17",
+        "class": "arm",
+        "error_m": 0.426
+      },
+      {
+        "det": 287,
+        "victim": 7,
+        "victim_id": "v07",
+        "class": "leg",
+        "error_m": 0.556
+      },
+      {
+        "det": 33,
+        "victim": 5,
+        "victim_id": "v05",
+        "class": "arm",
+        "error_m": 0.647
+      },
+      {
+        "det": 30,
+        "victim": 5,
+        "victim_id": "v05",
+        "class": "hand",
+        "error_m": 0.661
+      },
+      {
+        "det": 288,
+        "victim": 8,
+        "victim_id": "v08",
+        "class": "leg",
+        "error_m": 0.719
+      },
+      {
+        "det": 135,
+        "victim": 11,
+        "victim_id": "v11",
+        "class": "leg",
+        "error_m": 0.752
+      },
+      {
+        "det": 299,
+        "victim": 12,
+        "victim_id": "v12",
+        "class": "leg",
+        "error_m": 0.939
+      },
+      {
+        "det": 129,
+        "victim": 10,
+        "victim_id": "v10",
+        "class": "arm",
+        "error_m": 0.94
+      },
+      {
+        "det": 128,
+        "victim": 10,
+        "victim_id": "v10",
+        "class": "hand",
+        "error_m": 0.978
+      },
+      {
+        "det": 118,
+        "victim": 7,
+        "victim_id": "v07",
+        "class": "hand",
+        "error_m": 0.987
+      },
+      {
+        "det": 185,
+        "victim": 16,
+        "victim_id": "v16",
+        "class": "arm",
+        "error_m": 1.027
+      },
+      {
+        "det": 255,
+        "victim": 21,
+        "victim_id": "v21",
+        "class": "hand",
+        "error_m": 1.104
+      },
+      {
+        "det": 254,
+        "victim": 21,
+        "victim_id": "v21",
+        "class": "arm",
+        "error_m": 1.127
+      },
+      {
+        "det": 330,
+        "victim": 19,
+        "victim_id": "v19",
+        "class": "hand",
+        "error_m": 1.141
+      },
+      {
+        "det": 225,
+        "victim": 19,
+        "victim_id": "v19",
+        "class": "arm",
+        "error_m": 1.152
+      },
+      {
+        "det": 302,
+        "victim": 13,
+        "victim_id": "v13",
+        "class": "torso",
+        "error_m": 1.31
+      },
+      {
+        "det": 143,
+        "victim": 12,
+        "victim_id": "v12",
+        "class": "hand",
+        "error_m": 1.466
+      },
+      {
+        "det": 166,
+        "victim": 15,
+        "victim_id": "v15",
+        "class": "arm",
+        "error_m": 1.505
+      },
+      {
+        "det": 168,
+        "victim": 15,
+        "victim_id": "v15",
+        "class": "hand",
+        "error_m": 1.505
+      },
+      {
+        "det": 66,
+        "victim": 1,
+        "victim_id": "v01",
+        "class": "hand",
+        "error_m": 1.612
+      },
+      {
+        "det": 161,
+        "victim": 13,
+        "victim_id": "v13",
+        "class": "arm",
+        "error_m": 1.707
+      },
+      {
+        "det": 162,
+        "victim": 13,
+        "victim_id": "v13",
+        "class": "head",
+        "error_m": 1.708
+      },
+      {
+        "det": 240,
+        "victim": 22,
+        "victim_id": "v22",
+        "class": "hand",
+        "error_m": 1.718
+      },
+      {
+        "det": 163,
+        "victim": 13,
+        "victim_id": "v13",
+        "class": "hand",
+        "error_m": 1.753
+      },
+      {
+        "det": 241,
+        "victim": 22,
+        "victim_id": "v22",
+        "class": "arm",
+        "error_m": 1.754
+      }
+    ],
+    "false_positive_dets": [
+      0,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      16,
+      27,
+      35,
+      36,
+      42,
+      44,
+      45,
+      55,
+      56,
+      57,
+      91,
+      93,
+      94,
+      107,
+      109,
+      110,
+      111,
+      116,
+      117,
+      122,
+      124,
+      125,
+      136,
+      137,
+      138,
+      139,
+      140,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      159,
+      164,
+      170,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      181,
+      183,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      198,
+      199,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      211,
+      212,
+      214,
+      215,
+      216,
+      217,
+      218,
+      221,
+      224,
+      226,
+      227,
+      228,
+      229,
+      230,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      258,
+      259,
+      260,
+      261,
+      262,
+      271,
+      273,
+      275,
+      276,
+      277,
+      278,
+      282,
+      283,
+      290,
+      291,
+      296,
+      301,
+      303,
+      304,
+      305,
+      307,
+      314,
+      317,
+      324,
+      325,
+      326,
+      331,
+      332,
+      333,
+      334,
+      335
+    ],
+    "missed_truth": [
+      "v14/leg",
+      "v17/hand",
+      "v18/hand",
+      "v18/arm",
+      "v20/leg",
+      "v23/hand"
+    ]
+  },
+  "geolocation_true_pose": {
+    "radius_m": 2,
+    "min_truth_area_m2": 0.004,
+    "classes": [
+      {
+        "class": "hand",
+        "truth": 18,
+        "detections": 89,
+        "tp": 17,
+        "fp": 8,
+        "fn": 1,
+        "duplicates": 64,
+        "ignored": 0,
+        "precision": 0.68,
+        "recall": 0.944
+      },
+      {
+        "class": "arm",
+        "truth": 15,
+        "detections": 94,
+        "tp": 15,
+        "fp": 9,
+        "fn": 0,
+        "duplicates": 70,
+        "ignored": 0,
+        "precision": 0.625,
+        "recall": 1
+      },
+      {
+        "class": "leg",
+        "truth": 6,
+        "detections": 71,
+        "tp": 6,
+        "fp": 22,
+        "fn": 0,
+        "duplicates": 43,
+        "ignored": 0,
+        "precision": 0.214,
+        "recall": 1
+      },
+      {
+        "class": "head",
+        "truth": 4,
+        "detections": 28,
+        "tp": 4,
+        "fp": 6,
+        "fn": 0,
+        "duplicates": 18,
+        "ignored": 0,
+        "precision": 0.4,
+        "recall": 1
+      },
+      {
+        "class": "torso",
+        "truth": 5,
+        "detections": 54,
+        "tp": 5,
+        "fp": 7,
+        "fn": 0,
+        "duplicates": 42,
+        "ignored": 0,
+        "precision": 0.417,
+        "recall": 1
+      }
+    ],
+    "overall": {
+      "class": "all",
+      "truth": 48,
+      "detections": 336,
+      "tp": 47,
+      "fp": 52,
+      "fn": 1,
+      "duplicates": 237,
+      "ignored": 0,
+      "precision": 0.475,
+      "recall": 0.979
+    },
+    "victims_total": 23,
+    "victims_found": 23,
+    "victims_missed": [],
+    "geoloc_error_mean_m": 0.389,
+    "geoloc_error_median_m": 0.276,
+    "geoloc_error_p95_m": 1.402,
+    "geoloc_error_max_m": 1.901,
+    "matches": [
+      {
+        "det": 135,
+        "victim": 11,
+        "victim_id": "v11",
+        "class": "leg",
+        "error_m": 0.076
+      },
+      {
+        "det": 294,
+        "victim": 6,
+        "victim_id": "v06",
+        "class": "hand",
+        "error_m": 0.077
+      },
+      {
+        "det": 128,
+        "victim": 10,
+        "victim_id": "v10",
+        "class": "hand",
+        "error_m": 0.085
+      },
+      {
+        "det": 251,
+        "victim": 22,
+        "victim_id": "v22",
+        "class": "hand",
+        "error_m": 0.107
+      },
+      {
+        "det": 129,
+        "victim": 10,
+        "victim_id": "v10",
+        "class": "arm",
+        "error_m": 0.116
+      },
+      {
+        "det": 252,
+        "victim": 22,
+        "victim_id": "v22",
+        "class": "arm",
+        "error_m": 0.125
+      },
+      {
+        "det": 61,
+        "victim": 5,
+        "victim_id": "v05",
+        "class": "hand",
+        "error_m": 0.14
+      },
+      {
+        "det": 126,
+        "victim": 10,
+        "victim_id": "v10",
+        "class": "head",
+        "error_m": 0.147
+      },
+      {
+        "det": 103,
+        "victim": 9,
+        "victim_id": "v09",
+        "class": "head",
+        "error_m": 0.149
+      },
+      {
+        "det": 164,
+        "victim": 14,
+        "victim_id": "v14",
+        "class": "leg",
+        "error_m": 0.15
+      },
+      {
+        "det": 4,
+        "victim": 1,
+        "victim_id": "v01",
+        "class": "arm",
+        "error_m": 0.152
+      },
+      {
+        "det": 59,
+        "victim": 5,
+        "victim_id": "v05",
+        "class": "arm",
+        "error_m": 0.154
+      },
+      {
+        "det": 315,
+        "victim": 12,
+        "victim_id": "v12",
+        "class": "leg",
+        "error_m": 0.171
+      },
+      {
+        "det": 127,
+        "victim": 10,
+        "victim_id": "v10",
+        "class": "torso",
+        "error_m": 0.174
+      },
+      {
+        "det": 329,
+        "victim": 15,
+        "victim_id": "v15",
+        "class": "arm",
+        "error_m": 0.182
+      },
+      {
+        "det": 204,
+        "victim": 18,
+        "victim_id": "v18",
+        "class": "hand",
+        "error_m": 0.208
+      },
+      {
+        "det": 50,
+        "victim": 4,
+        "victim_id": "v04",
+        "class": "hand",
+        "error_m": 0.222
+      },
+      {
+        "det": 48,
+        "victim": 4,
+        "victim_id": "v04",
+        "class": "arm",
+        "error_m": 0.229
+      },
+      {
+        "det": 156,
+        "victim": 13,
+        "victim_id": "v13",
+        "class": "arm",
+        "error_m": 0.234
+      },
+      {
+        "det": 154,
+        "victim": 13,
+        "victim_id": "v13",
+        "class": "torso",
+        "error_m": 0.242
+      },
+      {
+        "det": 223,
+        "victim": 19,
+        "victim_id": "v19",
+        "class": "hand",
+        "error_m": 0.254
+      },
+      {
+        "det": 202,
+        "victim": 18,
+        "victim_id": "v18",
+        "class": "arm",
+        "error_m": 0.256
+      },
+      {
+        "det": 222,
+        "victim": 19,
+        "victim_id": "v19",
+        "class": "arm",
+        "error_m": 0.275
+      },
+      {
+        "det": 157,
+        "victim": 13,
+        "victim_id": "v13",
+        "class": "hand",
+        "error_m": 0.276
+      },
+      {
+        "det": 261,
+        "victim": 23,
+        "victim_id": "v23",
+        "class": "hand",
+        "error_m": 0.279
+      },
+      {
+        "det": 84,
+        "victim": 6,
+        "victim_id": "v06",
+        "class": "arm",
+        "error_m": 0.281
+      },
+      {
+        "det": 155,
+        "victim": 13,
+        "victim_id": "v13",
+        "class": "head",
+        "error_m": 0.283
+      },
+      {
+        "det": 101,
+        "victim": 7,
+        "victim_id": "v07",
+        "class": "leg",
+        "error_m": 0.285
+      },
+      {
+        "det": 288,
+        "victim": 8,
+        "victim_id": "v08",
+        "class": "leg",
+        "error_m": 0.299
+      },
+      {
+        "det": 17,
+        "victim": 2,
+        "victim_id": "v02",
+        "class": "hand",
+        "error_m": 0.325
+      },
+      {
+        "det": 326,
+        "victim": 16,
+        "victim_id": "v16",
+        "class": "hand",
+        "error_m": 0.329
+      },
+      {
+        "det": 15,
+        "victim": 2,
+        "victim_id": "v02",
+        "class": "torso",
+        "error_m": 0.38
+      },
+      {
+        "det": 281,
+        "victim": 3,
+        "victim_id": "v03",
+        "class": "arm",
+        "error_m": 0.381
+      },
+      {
+        "det": 19,
+        "victim": 2,
+        "victim_id": "v02",
+        "class": "arm",
+        "error_m": 0.391
+      },
+      {
+        "det": 185,
+        "victim": 16,
+        "victim_id": "v16",
+        "class": "arm",
+        "error_m": 0.402
+      },
+      {
+        "det": 242,
+        "victim": 21,
+        "victim_id": "v21",
+        "class": "arm",
+        "error_m": 0.409
+      },
+      {
+        "det": 29,
+        "victim": 3,
+        "victim_id": "v03",
+        "class": "torso",
+        "error_m": 0.434
+      },
+      {
+        "det": 168,
+        "victim": 15,
+        "victim_id": "v15",
+        "class": "hand",
+        "error_m": 0.525
+      },
+      {
+        "det": 32,
+        "victim": 3,
+        "victim_id": "v03",
+        "class": "hand",
+        "error_m": 0.528
+      },
+      {
+        "det": 194,
+        "victim": 17,
+        "victim_id": "v17",
+        "class": "torso",
+        "error_m": 0.561
+      },
+      {
+        "det": 324,
+        "victim": 17,
+        "victim_id": "v17",
+        "class": "head",
+        "error_m": 0.611
+      },
+      {
+        "det": 239,
+        "victim": 21,
+        "victim_id": "v21",
+        "class": "hand",
+        "error_m": 0.623
+      },
+      {
+        "det": 143,
+        "victim": 12,
+        "victim_id": "v12",
+        "class": "hand",
+        "error_m": 0.94
+      },
+      {
+        "det": 49,
+        "victim": 1,
+        "victim_id": "v01",
+        "class": "hand",
+        "error_m": 1.085
+      },
+      {
+        "det": 184,
+        "victim": 17,
+        "victim_id": "v17",
+        "class": "arm",
+        "error_m": 1.402
+      },
+      {
+        "det": 118,
+        "victim": 7,
+        "victim_id": "v07",
+        "class": "hand",
+        "error_m": 1.42
+      },
+      {
+        "det": 262,
+        "victim": 20,
+        "victim_id": "v20",
+        "class": "leg",
+        "error_m": 1.901
+      }
+    ],
+    "false_positive_dets": [
+      0,
+      8,
+      10,
+      12,
+      16,
+      27,
+      35,
+      45,
+      56,
+      100,
+      116,
+      136,
+      137,
+      139,
+      144,
+      145,
+      146,
+      147,
+      148,
+      150,
+      152,
+      153,
+      159,
+      176,
+      188,
+      190,
+      191,
+      198,
+      199,
+      201,
+      212,
+      215,
+      228,
+      233,
+      234,
+      235,
+      236,
+      237,
+      248,
+      249,
+      258,
+      259,
+      260,
+      271,
+      276,
+      277,
+      282,
+      301,
+      317,
+      332,
+      333,
+      335
+    ],
+    "missed_truth": [
+      "v17/hand"
+    ]
+  },
+  "timing": {
+    "frames": 71,
+    "median_ms": 900.6,
+    "p95_ms": 1479.9,
+    "median_infer_ms": 890.3,
+    "tiles_per_frame": 6
+  },
+  "detections": 336
+}

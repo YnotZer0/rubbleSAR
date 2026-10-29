@@ -1,0 +1,33 @@
+[Unit]
+Description=RubbleSAR edge-eye (simulated drone payload computer)
+Documentation=file:///opt/rubblesar/docs
+After=network-online.target time-sync.target
+Wants=network-online.target
+# A failing start (e.g. bad config) stops retrying after 10 attempts in 2 minutes.
+StartLimitIntervalSec=120
+StartLimitBurst=10
+
+[Service]
+Type=simple
+User=rubblesar
+Group=rubblesar
+SupplementaryGroups=video
+EnvironmentFile=-/etc/rubblesar/edge-eye.env
+# CUDA keeps its kernel cache here (the service account has no home folder).
+Environment=CUDA_CACHE_PATH=/var/lib/rubblesar/.nv-cache
+ExecStart=/opt/rubblesar/bin/edge-eye run --config /etc/rubblesar/edge-eye.toml
+WorkingDirectory=/var/lib/rubblesar
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=65536
+# Stop cleanly: the detection queue is on disk, nothing is lost.
+TimeoutStopSec=20
+# Hardening: edge-eye only needs the network, the GPU (group video) and its own state directory.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/rubblesar
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

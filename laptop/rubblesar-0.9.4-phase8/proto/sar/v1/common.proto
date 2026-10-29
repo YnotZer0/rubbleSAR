@@ -1,0 +1,33 @@
+// Common types shared by every RubbleSAR message.
+//
+// Wire-compatibility rules (apply to every .proto in this directory):
+//   * Never renumber or reuse a field number; mark removed fields `reserved`.
+//   * New fields are always optional in meaning: readers must cope with zero values.
+//   * Bump Header.schema only for a breaking change; readers reject unknown majors.
+syntax = "proto3";
+
+package sar.v1;
+
+option go_package = "rubblesar/internal/sarpb;sarpb";
+
+// Header is the first field of every top-level message.
+message Header {
+  // Schema major version. Currently 1.
+  uint32 schema = 1;
+  // Incident identifier, e.g. "antakya-demo". Must match the key expression.
+  string incident_id = 2;
+  // Who sent it, e.g. "uav/scout-1" or "zbook/sar-check".
+  string source_id = 3;
+  // Per-source, per-topic sequence number starting at 1. Gaps reveal loss.
+  uint64 seq = 4;
+  // Sender wall clock, UTC, nanoseconds since the Unix epoch.
+  int64 sent_unix_ns = 5;
+}
+
+// WGS84 position.
+message GeoPoint {
+  double lat_deg = 1;
+  double lon_deg = 2;
+  // Height above mean sea level in metres.
+  double alt_msl_m = 3;
+}

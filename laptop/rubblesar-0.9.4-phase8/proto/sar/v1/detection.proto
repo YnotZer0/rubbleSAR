@@ -1,0 +1,175 @@
+// Detection reports from the drones (edge-eye on the Jetson) to the ZBook.
+//
+// Keys:
+//   sar/{incident}/uav/{uav}/detection      Jetson -> ZBook, reliable, high priority
+//   sar/{incident}/uav/{uav}/ack            ZBook -> Jetson, detection ids received
+//   sar/{incident}/sim/uav/{uav}/truth      simulation only: ground truth per frame, for scoring
+//
+// A Detection is sent when a tracked body part is confirmed (reason NEW) and
+// again only when it changes materially (reason UPDATE). Every packet stays in
+// the drone's on-disk queue until the ZBook acknowledges its detection_id, so
+// a link outage loses nothing; a repeated packet keeps its id and header seq.
+syntax = "proto3";
+
+package sar.v1;
+
+import "sar/v1/common.proto";
+
+option go_package = "rubblesar/internal/sarpb;sarpb";
+
+enum PartClass {
+  PART_CLASS_UNSPECIFIED = 0;
+  PART_CLASS_HAND = 1;
+  PART_CLASS_ARM = 2;
+  PART_CLASS_LEG = 3;
+  PART_CLASS_HEAD = 4;
+  PART_CLASS_TORSO = 5;
+  // A warm spot in the human skin band with no body part seen in colour (thermal cue only).
+  PART_CLASS_WARM_SPOT = 6;
+}
+
+enum ReportReason {
+  REPORT_REASON_UNSPECIFIED = 0;
+  REPORT_REASON_NEW = 1;
+  REPORT_REASON_UPDATE = 2;
+  // Sent when an investigation hover ends, with the movement verdict (phase 4).
+  REPORT_REASON_INVESTIGATED = 3;
+}
+
+// What a packet carries; reduced when the link falls behind.
+enum Payload {
+  PAYLOAD_UNSPECIFIED = 0;
+  PAYLOAD_FULL = 1;          // visible crop (<= 128 px), thermal crop, outline
+  PAYLOAD_SMALL = 2;         // visible crop (<= 64 px), thermal crop, outline
+  PAYLOAD_THERMAL_ONLY = 3;  // thermal crop and outline, no visible crop
+  PAYLOAD_METADATA = 4;      // no crops
+}
+
+// Temperature of the part from the radiometric thermal frame.
+message ThermalReading {
+  bool readable = 1;
+  // Why not readable, e.g. "outside thermal view" or "too small (5 px)".
+  string not_readable_reason = 2;
+  // Skin: 75th percentile of the part's thermal pixels, degrees C.
+  float skin_c = 3;
+  // Surroundings: median of a ring around the part, degrees C.
+  float ambient_c = 4;
+  float delta_c = 5;
+  uint32 pixels = 6;
+  // In the human skin band and clearly warmer than the surroundings.
+  bool warm = 7;
+}
+
+// What a hover close to the part showed (phase 4). Frames are compared after
+// correcting for the drone's drift; a frame "moved" when enough of the part's
+// outline changed beyond a small tolerance.
+message Movement {
+  // Frames of the part taken while holding position over it.
+  uint32 hover_frames = 1;
+  uint32 moved_frames = 2;
+  // Largest share of the outline that changed (0..1).
+  float max_change = 3;
+  bool moved = 4;
+  // Seconds the part was watched during hovers.
+  float watched_s = 5;
+}
+
+// Camera pose as the drone's GPS and IMU report it (or the true pose, in SimFrameTruth).
+message CapturePose {
+  GeoPoint position = 1;
+  float alt_agl_m = 2;
+  float yaw_deg = 3;
+  float pitch_deg = 4;
+  float roll_deg = 5;
+}
+
+message Crop {
+  // "jpeg" (visible) or "png16-dk" (16-bit grey PNG, value = kelvin x 10).
+  string format = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  bytes data = 4;
+  // Region of the source frame the crop shows: x0, y0, x1, y1 in source pixels.
+  repeated float source_box = 5;
+}
+
+message Detection {
+  Header header = 1;
+  string uav_id = 2;
+  // Unique per packet: "<track_id>.<revision>". Acknowledged by the ZBook.
+  string detection_id = 3;
+  // Stable across updates, e.g. "scout-1-0007".
+  string track_id = 4;
+  // 1 = first report of the track.
+  uint32 revision = 5;
+  ReportReason reason = 6;
+  PartClass part = 7;
+  // Best model confidence over the observations, 0..1 (0 for warm spots).
+  float confidence = 8;
+  // Including repeated sightings and the thermal cue, 0..1.
+  float fused_confidence = 9;
+  // Ground position estimate (WGS84; altitude = ground at the site).
+  GeoPoint position = 10;
+  // Circular error probable of the position, metres (half of fixes fall inside).
+  float cep_m = 11;
+  // Visible area on the ground, square metres.
+  float area_m2 = 12;
+  // Frames the part was seen in.
+  uint32 observations = 13;
+  int64 first_seen_unix_ns = 14;
+  int64 last_seen_unix_ns = 15;
+  // Capture time of the frame the crops come from.
+  int64 capture_unix_ns = 16;
+  string frame_id = 17;
+  CapturePose capture_pose = 18;
+  ThermalReading thermal = 19;
+  // Outline of the part relative to the visible crop's source_box: x0, y0, x1, y1, ...
+  // in 0..1 (at most 32 points); valid whatever size the crop was sent at.
+  repeated float outline = 20;
+  Crop visible_crop = 21;
+  Crop thermal_crop = 22;
+  // One-line description for the map and ATAK remarks.
+  string summary = 23;
+  Payload payload = 24;
+  // Confidence-weighted class votes over the observations: hand, arm, leg, head, torso.
+  repeated float class_votes = 25;
+  // Scenario clock at capture, seconds (simulation only; 0 for real cameras).
+  double sim_time_s = 26;
+  // Distance from the camera to the part, metres.
+  float range_m = 27;
+  // Phase 4: the hover verdict, and the investigation task the report belongs to.
+  Movement movement = 28;
+  string task_id = 29;
+  // Closest the camera has been to the part, metres.
+  float min_range_m = 30;
+}
+
+// Sent by the ZBook for every Detection it has stored (also for repeats).
+message DetectionAck {
+  Header header = 1;
+  string uav_id = 2;
+  repeated string detection_ids = 3;
+}
+
+// Simulation side channel: the ground truth of one captured frame. Used only
+// to score the run; the onboard pipeline never sees it. Not counted against
+// the radio budget (it is not part of the simulated drone's radio traffic).
+message SimFrameTruth {
+  Header header = 1;
+  string uav_id = 2;
+  string frame_id = 3;
+  int64 capture_unix_ns = 4;
+  double sim_time_s = 5;
+  CapturePose true_pose = 6;
+  CapturePose reported_pose = 7;
+  repeated SimVisible visible = 8;
+}
+
+// One body part of one victim visible in a frame (all its pieces together).
+message SimVisible {
+  string victim_id = 1;
+  PartClass part = 2;
+  uint32 pixels = 3;
+  // True ground position of the visible part.
+  GeoPoint position = 4;
+}

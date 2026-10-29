@@ -1,0 +1,245 @@
+# RubbleSAR demo storyboard (phase 8): the chapters of the narrated replay
+# take, in order. `rubblesar demo init` copies this file to
+# ~/.config/rubblesar/storyboard.toml for you to edit; `rubblesar demo script`
+# prints the narration with this run's numbers filled in, and the length.
+#
+# Each chapter:
+#   id, title        a short name, and the heading shown above the caption
+#   narration        the voice-over; also shown as captions, a sentence or two
+#                    at a time, and written to the subtitles (narration.srt).
+#                    {{.Name}} fills in a number or word from the run (see
+#                    `rubblesar demo facts`); {{words .Sites}} spells it out.
+#   min_seconds      the chapter lasts at least this long (otherwise as long
+#                    as the narration takes at words_per_minute)
+#   card             title | section | end: a full-screen card over the map
+#                    (card_title, card_subtitle, card_lines; these take
+#                    {{.Name}} too)
+#   panel            the explanation beside the map: scenario, drones, camera,
+#                    model, packet, radio, zbook, triage, tak, aar, casualty,
+#                    found (the operator view's picture cards);
+#                    "" shows the operator view's own lists
+#   map              fit | sites | site:<id> | follow:<drone> |
+#                    casualty:<beat or id> | view:<lat>,<lon>,<zoom>
+#   replay, speed    where the replay jumps at the start of the chapter (a beat:
+#                    first-red, first-look, first-hover, first-team,
+#                    first-tak-team, first-freed, outage, survey-done, end,
+#                    with +/-seconds, or +mm:ss of run time) and how fast it
+#                    then plays (0 = held still; omitted = as before)
+#   focus            a casualty to highlight (a beat or an id)
+#   clock = "mission" shows the run time and the replay speed
+#   scenes           OBS scene per recorder for this chapter, e.g. { wintak = "WinTAK" }
+#   insert           rough cut: footage from the live take placed over this
+#                    chapter: "<recorder>@<beat><+/-offset>~<seconds>[@<delay>]";
+#                    "wintak|atak@..." uses the first that recorded the take
+#
+# Everything shown is simulated, and says so: keep the first and last chapters.
+
+title = "RubbleSAR"
+words_per_minute = 150
+# How the video names the command post's computer ({{.CommandPost}}; the
+# panels use it too). The video never names the laptop's make.
+command_post = "a GPU-equipped laptop"
+
+[[chapter]]
+id = "title"
+title = "RubbleSAR"
+card = "title"
+card_title = "RubbleSAR"
+card_subtitle = "Drones that find people trapped in rubble, and send rescue teams to them."
+card_lines = ["A simulated earthquake response, end to end", "{{.Place}}", "Jetson Orin Nano on the drones; {{.CommandPost}} at the command post"]
+map = "sites"
+replay = "start"
+speed = 0
+min_seconds = 9
+narration = """
+This is RubbleSAR, drone search and rescue support for collapsed buildings. \
+Everything you are about to see is a simulation, built so the whole system can be tested before anyone flies over real rubble.
+"""
+
+[[chapter]]
+id = "place"
+title = "The incident"
+panel = "scenario"
+map = "sites"
+map_ms = 2500
+min_seconds = 14
+narration = """
+The scene is {{.Place}}{{.PlaceNote}}. \
+In this scenario {{words .Sites}} {{plural .Sites "building has" "buildings have"}} collapsed. \
+Under the rubble are {{.Victims}} simulated people: {{.VictimsSentence}}. \
+Rubble has closed the streets around them, and the rescue teams wait at a command post nearby.
+"""
+
+[[chapter]]
+id = "drones"
+title = "Three drones, one small computer"
+panel = "drones"
+map = "follow:scout-1"
+replay = "survey"
+speed = 6
+clock = "mission"
+min_seconds = 16
+narration = """
+A Jetson Orin Nano plays the payload computer of {{words .Drones}} simulated drones. \
+The scout surveys the collapse sites at {{.ScoutAltM}} metres, in the shortest round trip from its home: the numbered dashed line. \
+Two investigator drones wait at home to be sent for close looks. \
+Their flight, their GPS and compass errors and their batteries are simulated; the image processing that follows is real.
+"""
+
+[[chapter]]
+id = "camera"
+title = "What the drone sees"
+panel = "camera"
+map = "follow:scout-1"
+replay = "first-casualty-15s"
+speed = 4
+clock = "mission"
+min_seconds = 14
+narration = """
+Each drone carries two cameras: colour in full HD, and a radiometric thermal camera that measures temperature. \
+These are frames the scout captured over the rubble, at about {{.GSDcm}} centimetres a pixel, with dust, debris and people partly buried.
+"""
+
+[[chapter]]
+id = "model"
+title = "Finding people in the pixels"
+panel = "model"
+min_seconds = 18
+narration = """
+On the Jetson, every frame is cut into six tiles and passed through a YOLO11 segmentation network, trained on synthetic rubble images. \
+It runs on the Jetson's graphics processor with TensorRT, and outlines hands, arms, legs, heads and torsos, each with a confidence score, \
+in about {{.SegMS}} milliseconds a frame.
+"""
+
+[[chapter]]
+id = "packet"
+title = "From a detection to a report"
+panel = "packet"
+map = "casualty:first-red"
+replay = "first-red"
+speed = 2
+focus = "first-red"
+clock = "mission"
+min_seconds = 18
+narration = """
+The thermal camera reads each body part against the rubble around it: here {{.FirstRedSkin}} degrees against {{.FirstRedAmbient}}. \
+A part seen in two frames is tracked, placed on the map with an honest error circle, and packed into a report: \
+a small colour crop, a thermal crop and an outline: {{.AvgReportKB}} kilobytes, instead of {{.FrameSize}} for the whole frames.
+"""
+
+[[chapter]]
+id = "radio"
+title = "Built for a poor radio link"
+panel = "radio"
+map = "follow:scout-1"
+replay = "outage-12s"
+speed = 4
+clock = "mission"
+min_seconds = 22
+narration = """
+Each drone has a limited radio budget, {{.BudgetKbps}} kilobits a second here. Telemetry goes first, then reports by urgency, \
+and when the link falls behind, reports shrink instead of being dropped. \
+{{if .Blackout}}Here, as a test, the link of {{.BlackoutUAV}} is cut completely for {{.BlackoutS}} seconds. Its reports wait on board, and when the link comes back they are delivered and acknowledged{{if eq .Lost 0}}: none is lost{{else}}; {{.Lost}} {{plural .Lost "report was" "reports were"}} lost{{end}}.{{else}}Every report waits on board until the command post has acknowledged it, so a lost link need not lose anything.{{end}}
+"""
+
+[[chapter]]
+id = "zbook"
+title = "The command post"
+panel = "zbook"
+map = "fit"
+replay = "first-team+20s"
+speed = 4
+clock = "mission"
+min_seconds = 24
+narration = """
+At the command post, {{.CommandPost}} receives the reports over Zenoh. \
+casualty-analyst stores and acknowledges each one, and merges what different drones saw into one record per person. \
+mission-planner sends an investigator wherever a closer look could change the answer, \
+and rescue-dispatch sends the nearest free rescue team.
+"""
+
+[[chapter]]
+id = "triage"
+title = "The close look, and triage"
+panel = "triage"
+map = "casualty:first-hover"
+replay = "first-hover-5s"
+speed = 2
+focus = "first-hover"
+clock = "mission"
+min_seconds = 22
+narration = """
+A warm body part not yet seen close up is provisionally Red. An investigator hovers over it for {{.HoverS}} seconds. \
+If it moves, the person is trapped but responsive: Yellow. Still and warm: Red. At the temperature of the rubble: Black. \
+These colours are suggestions for a person to confirm, and the thresholds still await medical review.
+"""
+
+[[chapter]]
+id = "dispatch"
+title = "Sending the rescue teams"
+map = "fit"
+replay = "first-team-5s"
+speed = 8
+clock = "mission"
+min_seconds = 20
+narration = """
+Red casualties first, then Yellow, each to the nearest free team, along streets clear of rubble and then on foot over the debris. \
+How long freeing each person will take is estimated from how the building collapsed and how deeply they are buried.
+"""
+
+[[chapter]]
+id = "tak"
+title = "On the rescuers' own devices"
+panel = "tak"
+map = "fit"
+replay = "first-tak-team-5s"
+speed = 4
+clock = "mission"
+min_seconds = 24
+insert = "wintak|atak@first-tak-team-5s~18"
+narration = """
+Rescuers already carry ATAK on phones and WinTAK on laptops. RubbleSAR talks to them through a TAK server, \
+so casualties, drones, teams, routes and the rubble appear on their maps, over an offline map served from the command post. \
+A team with a TAK device gets its casualty as a chat message and a route, and answers done, or unable.
+"""
+
+[[chapter]]
+id = "operator"
+title = "For everyone else"
+panel = "found"
+map = "fit"
+speed = 12
+clock = "mission"
+min_seconds = 12
+narration = """
+Anyone else on the network, in the command post or on a tablet, opens this live view in a browser. \
+It leads with what the drones found: the pictures they sent, what the model outlined, the temperature, and what is being done for each person.
+"""
+
+[[chapter]]
+id = "aar"
+title = "After the mission"
+panel = "aar"
+map = "fit"
+replay = "end"
+speed = 0
+min_seconds = 26
+narration = """
+Every run is recorded and ends with an after-action report. In this run, {{.Found}} of {{.Victims}} people were found, \
+and {{if eq .Rescued .RedYellow}}all {{.RedYellow}}{{else}}{{.Rescued}} of {{.RedYellow}}{{end}} Red and Yellow casualties were reached and freed. \
+Simulated teams move faster than real ones, so the report also estimates real rescue times: a median of {{.RealFreeing}} to free each person. \
+{{if .FalseRecords}}{{.FalseRecords}} {{plural .FalseRecords "record was a false alarm" "records were false alarms"}}, debris taken for a body part: that is the next thing to improve.{{end}}
+"""
+
+[[chapter]]
+id = "end"
+title = "RubbleSAR"
+card = "end"
+card_title = "RubbleSAR"
+card_subtitle = "From a drone's camera to a rescue team's map, with no internet."
+card_lines = ["Simulated end to end, and tested at every step", "Next: secure links, link-loss trials, a real camera"]
+map = "fit"
+min_seconds = 9
+narration = """
+RubbleSAR: from a drone's camera to a rescue team's map, in minutes, on a small computer aboard the drone and {{.CommandPost}} at the command post, with no internet.
+"""

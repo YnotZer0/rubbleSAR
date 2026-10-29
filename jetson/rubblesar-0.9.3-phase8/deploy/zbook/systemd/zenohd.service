@@ -1,0 +1,23 @@
+[Unit]
+Description=Eclipse Zenoh router (RubbleSAR)
+Documentation=https://zenoh.io
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zenohd
+Group=zenohd
+Environment=RUST_LOG=warn
+Environment=NO_COLOR=1
+ExecStart=/usr/local/bin/zenohd --config /etc/rubblesar/zenohd.json5
+Restart=on-failure
+RestartSec=2
+LimitNOFILE=65536
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

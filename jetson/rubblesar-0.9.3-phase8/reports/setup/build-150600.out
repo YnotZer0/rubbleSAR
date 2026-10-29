@@ -1,0 +1,17 @@
+make: Entering directory '/home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8'
+CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X rubblesar/internal/version.Version=0.9.3-phase8 -X rubblesar/internal/version.Commit=259771dd3b -X rubblesar/internal/version.BuildTime=2026-10-21T15:06:00Z" -o bin/sar-doctor ./cmd/sar-doctor
+built bin/sar-doctor
+CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X rubblesar/internal/version.Version=0.9.3-phase8 -X rubblesar/internal/version.Commit=259771dd3b -X rubblesar/internal/version.BuildTime=2026-10-21T15:06:00Z" -o bin/scenario-tool ./cmd/scenario-tool
+go build edge-eye
+go build sar-check
+go build sar-monitor
+go build sar-infer
+go build casualty-analyst
+go build mission-planner
+go build rescue-dispatch
+go build rubblesar
+go build sar-web
+inference back ends: ort trt
+built: casualty-analyst edge-eye mission-planner rescue-dispatch rubblesar sar-check sar-doctor sar-infer sar-monitor sar-web scenario-tool 
+sar-check 0.9.3-phase8 (phase 8, commit 259771dd3b, built 2026-10-21T15:06:00Z, go1.26.0 linux/arm64, zenoh-c 1.9.0)
+make: Leaving directory '/home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8'

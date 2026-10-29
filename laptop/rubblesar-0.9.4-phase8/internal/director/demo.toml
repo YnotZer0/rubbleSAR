@@ -1,0 +1,86 @@
+# RubbleSAR demo director (rubblesar demo, phase 8): where the takes go, the
+# recorders it starts and stops, the live take's staged link events.
+# `rubblesar demo init` writes this file to ~/.config/rubblesar/demo.toml
+# (readable by you only: it holds the OBS passwords). docs/PHASE8.md explains
+# every setting and how to set up OBS on the ZBook and the WinTAK laptop.
+
+[demo]
+# Where each take's cue sheet, narration, subtitles and rough cut are written.
+takes_dir = "~/rubblesar-takes"
+# The storyboard ("" = the built-in one; `rubblesar demo init` writes a copy
+# next to this file to edit).
+storyboard = ""
+# sar-web on this ZBook (the director controls its replay and presenter).
+web = "http://127.0.0.1:8090"
+# edge-eye's seed on the Jetson (edge-eye.toml: seed): with it, `rubblesar
+# demo media` renders a drone's frame exactly as the drone saw it.
+edge_seed = 1
+# Seconds of slate (a clapperboard on the presenter, the take's name) before
+# a take and after it, to line the recordings up in the editor.
+slate_s = 3
+# A text-to-speech command for a voice track in the rough cut ("" = none, the
+# rough cut is silent and you record the voice-over yourself). The narration
+# is given on standard input; {out} is the WAV file to write. Examples:
+#   "piper --model /home/you/voices/en_GB-alan-medium.onnx --output_file {out}"
+#   "espeak-ng -v en-gb -s 155 -w {out}"
+tts = ""
+
+# The live take (`rubblesar demo live`): a normal mission, recorded, with the
+# radio events below staged so the video can show them. "at" is a moment of
+# the run: a beat (first-casualty, first-red, first-look, first-team,
+# first-tak-team, survey-done) with +/-seconds, or +mm:ss from the start.
+[[live.event]]
+at = "first-red+45s"
+uav = "scout-1"
+# Cut the drone's radio budget to this (kbit/s) for a while: the link falls
+# behind and the reports shrink (small crops, then thermal only).
+budget_kbps = 24
+for = "60s"
+
+[[live.event]]
+at = "first-red+150s"
+uav = "scout-1"
+# A full blackout: the drone sends nothing for this long; its reports wait on
+# board and all arrive afterwards.
+blackout = "60s"
+
+# Recorders. kind = "obs": OBS Studio 28 or later with its WebSocket server on
+# (Tools > WebSocket Server Settings: enable, set a password; port 4455; on
+# Windows allow it through the firewall for the ZBook). kind = "command": a
+# program started when the take starts and stopped (Ctrl-C) when it ends,
+# e.g. scrcpy recording an ATAK phone; {file} is a file in the take's folder.
+# takes: which takes it records (live, replay).
+
+[[recorder]]
+name = "zbook"
+kind = "obs"
+url = "ws://127.0.0.1:4455"
+password = ""
+takes = ["live", "replay"]
+# The scene to record in each take (`rubblesar demo obs-setup --recorder zbook`
+# creates both, showing the presenter page and the live operator view).
+scene_live = "RubbleSAR operator view"
+scene_replay = "RubbleSAR presenter"
+
+[[recorder]]
+name = "wintak"
+kind = "obs"
+# The WinTAK laptop's address on the incident network.
+url = "ws://192.168.0.50:4455"
+password = ""
+takes = ["live", "replay"]
+scene_live = "WinTAK"
+scene_replay = "WinTAK"
+# Set enabled = false to leave a recorder out without deleting it.
+enabled = false
+
+# An ATAK phone over USB (adb) or Wi-Fi, recorded with scrcpy on the ZBook.
+[[recorder]]
+name = "atak"
+kind = "command"
+# -N: record without a window (scrcpy 1.x and 2.x); add --no-audio on 2.x for
+# a silent file.
+start = "scrcpy -N --record={file}"
+file = "atak.mkv"
+takes = ["live"]
+enabled = false

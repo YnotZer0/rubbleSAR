@@ -1,0 +1,4 @@
+make: Entering directory '/home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8'
+CGO_ENABLED=1 go test -count=1 ./internal/bus/zenoh/
+ok  	rubblesar/internal/bus/zenoh	3.185s
+make: Leaving directory '/home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8'

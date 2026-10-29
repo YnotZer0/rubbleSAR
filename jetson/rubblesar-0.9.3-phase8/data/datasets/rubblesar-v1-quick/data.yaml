@@ -1,0 +1,11 @@
+# RubbleSAR body-part segmentation dataset, written by scenario-tool dataset.
+# Paths are relative to this file. Ultralytics finds labels/ next to images/.
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: hand
+  1: arm
+  2: leg
+  3: head
+  4: torso

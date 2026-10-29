@@ -1,0 +1,51 @@
+
+==> Toolchain
+    go version go1.26.0 linux/arm64
+    zenohc 1.9.0
+    onnxruntime 1.22.0
+    tensorrt 10.3.0.30-1+cuda12.5
+
+==> Static checks (go vet, gofmt) - advisory
+    ok: vet clean
+
+==> Building binaries
+    running: make -C /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8 build
+    ok: build passed (full output: /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8/reports/setup/build-150600.out)
+    total 97036
+    -rwxrwxr-x 1 tony tony  8749432 Oct 21 16:06 casualty-analyst
+    -rwxrwxr-x 1 tony tony  9672888 Oct 21 16:06 edge-eye
+    -rwxrwxr-x 1 tony tony  8662840 Oct 21 16:06 mission-planner
+    -rwxrwxr-x 1 tony tony  8989560 Oct 21 16:06 rescue-dispatch
+    -rwxrwxr-x 1 tony tony 11445208 Oct 21 16:06 rubblesar
+    -rwxrwxr-x 1 tony tony 12521560 Oct 21 16:06 sar-check
+    -rwxrwxr-x 1 tony tony  8650914 Oct 21 16:06 sar-doctor
+    -rwxrwxr-x 1 tony tony  6995544 Oct 21 16:06 sar-infer
+    -rwxrwxr-x 1 tony tony  4695704 Oct 21 16:06 sar-monitor
+    -rwxrwxr-x 1 tony tony 11808984 Oct 21 16:06 sar-web
+    -rwxrwxr-x 1 tony tony  7143586 Oct 21 16:06 scenario-tool
+
+==> Unit tests (no network needed)
+    running: make -C /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8 test-unit
+    ok: unit-tests passed (full output: /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8/reports/setup/unit-tests-150621.out)
+
+==> Inference back-end tests (ONNX Runtime, TensorRT)
+    running: make -C /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8 test-infer
+    ok: infer-tests passed (full output: /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8/reports/setup/infer-tests-151848.out)
+
+==> zenoh library tests (local sessions over 127.0.0.1)
+    running: make -C /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8 test-zenoh
+    ok: zenoh-tests passed (full output: /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8/reports/setup/zenoh-tests-151852.out)
+
+==> Loopback self-test with the built sar-check
+sar-check 0.9.3-phase8 (phase 8, commit 259771dd3b, built 2026-10-21T15:06:00Z, go1.26.0 linux/arm64, zenoh-c 1.9.0)
+Loopback self-test: two zenoh sessions on this machine (no router needed)
+  [PASS] LB-01 Open two local zenoh sessions .....   0.0s  zenoh 1.9.0 via tcp/127.0.0.1:32879
+  [PASS] LB-02 Small messages in order ...........   0.5s  500 x 200 B delivered intact and in order in 12ms
+  [PASS] LB-03 Large messages intact .............   0.5s  20 x 262144 B delivered intact and in order in 19ms
+
+RESULT: PASS  (3 passed, 0 warnings, 0 failed, 0 skipped)
+Report saved: reports/loopback-jetson-20261021T151857Z.json
+
+DONE: scripts/jetson/20-build.sh completed successfully.
+Log: /home/tony/dev/rubbleSAR/rubblesar-0.9.3-phase8/reports/setup/jetson-20-build-20261021T150552Z.log
+Next: scripts/jetson/30-install.sh --zbook-ip <ZBook Wi-Fi IP address>

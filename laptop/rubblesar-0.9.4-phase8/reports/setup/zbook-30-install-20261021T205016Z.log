@@ -1,0 +1,117 @@
+
+==> Checking sudo access (you may be asked for your password)
+    ok: sudo available
+
+==> Installing binaries to /opt/rubblesar/bin
+    ok: sar-check 0.9.4-phase8 (phase 8, commit 02a8af94f6, built 2026-10-21T20:27:54Z, go1.26.8 linux/amd64, zenoh-c 1.9.0)
+
+==> Configuration /etc/rubblesar/sar.toml
+    WARNING: kept your existing /etc/rubblesar/sar.toml; release default saved as /etc/rubblesar/sar.toml.new (use --force-config to replace)
+
+==> Serving time to the Jetson (chrony)
+    ok: chrony serves time on UDP 123 to private networks
+    ok: service account 'rubblesar' exists
+
+==> casualty-analyst service (stores the detections, merges them into triaged casualties)
+    OK: /etc/rubblesar/sar.toml
+      incident antakya-demo, store /var/lib/rubblesar/detections/antakya-demo (crops true), acknowledgements every 200ms, status API 127.0.0.1:9102
+      fusion: parts within 2.0 m are one person (span 2.5 m; one class within 1.5 m counts once), matching gate max(5 m, 3.0 CEPs), list every 10s
+      triage: warm = skin 20-40 C and 3.0 C above ambient (clothing: from 15 C and 8.0 C above); close look = within 20 m for 20 s; moved = 2 frames of a hover aimed at it; cooling 0.5 C/h over 10m0s; not found after 2 looks
+    ok: casualty-analyst is running
+    casualty-analyst 0.9.4-phase8 (phase 8, commit 02a8af94f6, built 2026-10-21T20:27:54Z, go1.26.8 linux/amd64, zenoh-c 1.9.0)
+    incident antakya-demo, store /var/lib/rubblesar/detections/antakya-demo, up since 2026-10-21T20:50:23Z, 842 reports loaded from disk, 0 invalid
+    UAV        STORED    REPEATS  ACKS SENT     KBYTES LAST SEQ  LAST
+    
+    casualties: 33 (19 Red, 3 Yellow, 11 Black), 0 provisional, 0 need a close look, 0 merged away, 0 task lists received
+    ID     TRIAGE   STATUS              CEP m LOOKS SEEN BY                WHY
+    C-001  Black    no heat               1.0     1 inv-1,inv-2,scout-1    Black: at ambient after a close look, +-1.0 m
+    C-002  Red      warm unresponsive     0.9     1 inv-1,inv-2,scout-1    Red: warm, no movement in 52 s watched close up, +-0.9 m
+    C-003  Red      warm unresponsive     1.0     2 inv-1,inv-2,scout-1    Red: warm, no movement in 77 s watched close up, +-1.0 m
+    C-005  Red      warm unresponsive     1.5     1 inv-1                  Red: warm, no movement in 33 s watched close up, +-1.5 m
+    C-006  Yellow   warm responsive       0.9     1 inv-1,inv-2,scout-1    Yellow: moved while watched close up, +-0.9 m
+    C-007  Red      warm unresponsive     0.8     1 inv-1,inv-2,scout-1    Red: warm, no movement in 33 s watched close up, +-0.8 m
+    C-008  Black    no heat               0.9     1 inv-1,inv-2,scout-1    Black: at ambient after a close look, +-0.9 m
+    C-010  Red      warm unresponsive     0.9     1 inv-1,inv-2,scout-1    Red: warm, no movement in 30 s watched close up, +-0.9 m
+    C-011  Red      warm unresponsive     1.0     1 inv-1,inv-2,scout-1    Red: warm, no movement in 30 s watched close up, +-1.0 m
+    C-012  Red      warm unresponsive     1.4     1 inv-1,scout-1          Red: warm, no movement in 30 s watched close up, +-1.4 m
+    C-014  Black    no heat               0.9     1 inv-1,inv-2,scout-1    Black: at ambient after a close look, +-0.9 m
+    C-016  Red      warm unresponsive     1.5     1 inv-2                  Red: warm when looked at close up; movement not watched (no outline to follow), +-1.5 m
+    C-017  Red      deteriorating         1.0     1 inv-1,inv-2,scout-1    Red: warm but cooling 5.3 C/h, +-1.0 m
+    C-018  Red      warm unresponsive     0.8     1 inv-1,inv-2,scout-1    Red: warm, no movement in 32 s watched close up, +-0.8 m
+    C-019  Yellow   warm responsive       0.9     1 inv-1,inv-2,scout-1    Yellow: moved while watched close up, +-0.9 m
+    C-020  Black    no heat               1.1     1 inv-1,scout-1          Black: at ambient after a close look, +-1.1 m
+    C-021  Red      warm unresponsive     0.8     1 inv-1,inv-2,scout-1    Red: warm, no movement in 60 s watched close up, +-0.8 m
+    C-022  Red      warm unresponsive     1.2     1 inv-2,scout-1          Red: warm, no movement in 31 s watched close up, +-1.2 m
+    C-023  Red      warm unresponsive     1.1     1 inv-1,inv-2            Red: warm, no movement in 30 s watched close up, +-1.1 m
+
+==> mission-planner service (sends the investigators to casualties that need a close look)
+    OK: /etc/rubblesar/sar.toml
+      incident antakya-demo, status API 127.0.0.1:9103, tasks kept in /var/lib/rubblesar/planner/antakya-demo.json
+      investigations: 15 m above the casualty for 30 s, parts within 6 m count; at most 2 looks per casualty
+      drones: every drone with role investigator; keep 25% battery; task timeout 4m0s, command timeout 3s
+    ok: mission-planner is running
+    mission-planner 0.9.4-phase8 (phase 8, commit 02a8af94f6, built 2026-10-21T20:27:54Z, go1.26.8 linux/amd64, zenoh-c 1.9.0)
+    run u0n; casualties from casualty-analyst: none received yet
+    UAV      ROLE          ONLINE   STATE         BATTERY   FLIGHT  TASK           NOTE
+    inv-1    investigator* yes      landed           100%      30m  T-u0n-040 (done) 
+    inv-2    investigator* yes      landed           100%      30m  T-u0n-042 (done) 
+    scout-1  scout         yes      landed           100%      30m  -              
+    (* = takes investigations)
+    
+    tasks: 35 done, 9 cancelled
+    TASK        CAS    TIER STATE      UAV     TRY DIST m FRAMES FOUND  NOTE
+    T-u0n-001   C-001     2 done       inv-2     1    568     29 yes    29 frames, 4 parts near the target
+    T-u0n-002   C-002     2 done       inv-2     1    476     28 yes    28 frames, 5 parts near the target
+    T-u0n-003   C-003     2 done       inv-1     1    522     30 yes    30 frames, 7 parts near the target
+    T-u0n-004   C-004     1 done       inv-1     1    495     29 yes    29 frames, 7 parts near the target
+    T-u0n-005   C-005     1 cancelled  -         0      0      0 -      no longer needs a look: warm, no movement in 21 s watched close up
+    T-u0n-006   C-006     1 done       inv-2     1    159     27 moved  27 frames, 5 parts near the target, movement seen
+    T-u0n-007   C-007     1 done       inv-1     1    185     27 yes    27 frames, 6 parts near the target
+    T-u0n-008   C-008     2 done       inv-1     1    183     30 yes    30 frames, 3 parts near the target
+    T-u0n-009   C-009     1 cancelled  -         0      0      0 -      casualty merged into another or gone
+    T-u0n-010   C-010     1 done       inv-1     1      3     30 yes    30 frames, 4 parts near the target
+    T-u0n-011   C-011     1 done       inv-2     1      9     29 yes    29 frames, 7 parts near the target
+    T-u0n-012   C-012     1 done       inv-1     1      7     28 yes    28 frames, 5 parts near the target
+    T-u0n-013   C-013     1 cancelled  -         0      0      0 -      casualty merged into another or gone
+    T-u0n-014   C-014     2 done       inv-2     1      8     29 yes    29 frames, 4 parts near the target
+    T-u0n-015   C-015     2 cancelled  -         0      0      0 -      casualty merged into another or gone
+
+==> rescue-dispatch service (sends the rescue teams, feeds the TAK map)
+    OK: /etc/rubblesar/sar.toml
+      incident antakya-demo, status API 127.0.0.1:9104, state in /var/lib/rubblesar/dispatch/antakya-demo.json
+      streets: /var/lib/rubblesar/roads/antakya-demo.json (rubble from the scenario, closed within 1 m)
+      TAK: 127.0.0.1:8087 (plain TCP) as SAR-OPS, markers every 30s (stale after 5m0s), drones every 2s
+      teams start at 36.20160, 36.15850: TEAM-1 (team-1, foot, sim), TEAM-2 (team-2, foot, sim), TEAM-3 (team-3, vehicle, sim), ATAK-1 (atak-1, foot, tak), CHECK-1 (check-1, foot, tak)
+      dispatch: red first, then yellow (black and grey get no team); reached within 15 m; freeing the casualty (15 min..6 h from the scenario), then 10m0s handing over
+      simulated teams move 5x and rescue 30x faster than real time; a TAK team that neither answers nor moves loses its casualty after 3m0s
+    ok: rescue-dispatch is running
+    rescue-dispatch 0.9.4-phase8 (phase 8, commit 02a8af94f6, built 2026-10-21T20:27:54Z, go1.26.8 linux/amd64, zenoh-c 1.9.0)
+    run u0n; casualties: none received yet; simulated teams move 5x and free casualties 30x faster than real time
+    streets: osm, 119.9 km (806 ways, 1 rivers), 15 pieces closed by 5 rubble areas (/var/lib/rubblesar/roads/antakya-demo.json)
+    TAK: connected to 127.0.0.1:8087 as SAR-OPS; 6 events sent, 46 received; users: ATAK-1
+    
+    TEAM     CALLSIGN  MODE    SOURCE STATE     CASUALTY          ETA  DONE  POSITION
+    team-1   TEAM-1    foot    sim    idle      -                   -     8  36.20160,36.15843
+    team-2   TEAM-2    foot    sim    idle      -                   -     5  36.20160,36.15848
+    team-3   TEAM-3    vehicle sim    idle      -                   -     9  36.20160,36.15852
+    atak-1   ATAK-1    foot    tak    offline   -                   -     0  36.20160,36.15850 (1 s ago)
+    check-1  CHECK-1   foot    tak    offline   -                   -     0  (no position report yet)
+    
+    waiting for a team: none
+
+==> sar-web service (the offline map, the live operator view, the after-action reports, port 8090)
+    OK: /etc/rubblesar/sar.toml
+      serving /var/lib/rubblesar/www on 0.0.0.0:8090 (map: /var/lib/rubblesar/www/map/antakya-demo, reports: /var/lib/rubblesar/www/reports/antakya-demo)
+    ok: sar-web is running
+    sar-web 0.9.4-phase8 (phase 8, commit 02a8af94f6, built 2026-10-21T20:27:54Z, go1.26.8 linux/amd64, zenoh-c 1.9.0)
+    serving /var/lib/rubblesar/www on 127.0.0.1:8090
+      map antakya-demo: 1877 tiles, zoom 13-19, antakya-demo.mbtiles
+      after-action reports: 7
+      open http://192.168.0.213:8090/ on the network
+      open http://10.42.0.0:8090/ on the network
+      open http://10.42.0.1:8090/ on the network
+    the live operator view: http://192.168.0.213:8090/ops/ (any browser on the network)
+
+DONE: scripts/zbook/30-install.sh completed successfully.
+Log: /home/tony/dev/rubbleSAR/16/rubblesar-0.9.4-phase8/reports/setup/zbook-30-install-20261021T205016Z.log
+Next: docs/PHASE7.md (90-phase7-test.sh), then docs/PHASE8.md for the demo video

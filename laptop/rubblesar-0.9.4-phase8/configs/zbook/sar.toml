@@ -1,0 +1,228 @@
+# RubbleSAR ZBook configuration (casualty-analyst, mission-planner, rescue-dispatch, sar-monitor, sar-check)   phase 5
+# Installed to /etc/rubblesar/sar.toml by scripts/zbook/30-install.sh.
+
+[site]
+# Must match the Jetson's /etc/rubblesar/edge-eye.toml.
+incident_id = "antakya-demo"
+center_lat = 36.20250
+center_lon = 36.16056
+ground_alt_msl_m = 80.0
+radius_m = 805.0
+# Phase 1+: the simulated scenario (scenario.json + rendered layers).
+# Written by scripts/zbook/60-scenario.sh (ZBook) and 65-push-scenario.sh (Jetson).
+scenario_dir = "/var/lib/rubblesar/scenarios/antakya-demo"
+
+[zenoh]
+mode = "client"
+# zenohd runs on this machine.
+connect = ["tcp/127.0.0.1:7447"]
+open_timeout = "10s"
+
+[log]
+level = "info"
+format = "text"
+
+[check]
+# Drones sar-check expects to hear (ids from the Jetson's edge-eye.toml).
+expect_uavs = ["scout-1", "inv-1", "inv-2"]
+expect_rate_hz = 1.0
+discover_timeout = "20s"
+rate_window = "30s"
+rate_tolerance_pct = 10.0
+# Median receive-minus-send time allowed before warning (network delay + clock offset).
+max_clock_offset = "250ms"
+ping_timeout = "2s"
+report_dir = "reports"
+
+[monitor]
+refresh = "1s"
+stale_after = "5s"
+
+[analyst]
+# casualty-analyst stores every detection report here (in a folder named after
+# the incident) and acknowledges it to the drone, which then frees its queue.
+store_dir = "/var/lib/rubblesar/detections"
+# Keep the colour and thermal crops as files next to detections.jsonl.
+save_crops = true
+# Acknowledgements are batched this often.
+ack_interval = "200ms"
+# Local status API used by 'casualty-analyst status'.
+listen = "127.0.0.1:9102"
+
+# Phase 4: merging the reports into casualty records.
+[analyst.fusion]
+# One drone's parts seen together within link_m are one person (span_m for a
+# hand and arm, or a head and torso); a person shows at most 2 hands, arms and
+# legs and 1 head and torso. Parts of one class within duplicate_m of each
+# other count once (a real model reports one leg as two or three pieces).
+link_m = 2.0
+span_m = 2.5
+duplicate_m = 1.5
+window = "10s"
+# Records of different drones are compared within max(match_min_m, match_ceps x
+# their combined CEP); each drone's records join one-to-one after removing the
+# shift between the drones' GPS errors.
+match_min_m = 5.0
+match_ceps = 3.0
+# The whole casualty list is also published this often.
+publish_interval = "10s"
+
+# Phase 4: START triage from the thermal reading and the close look.
+# Thresholds are illustrative and await medical sign-off (decision D9).
+[analyst.triage]
+# Warm: bare skin (hand, head) within skin_min_c..skin_max_c and warm_delta_c
+# above ambient. When only clothing is read (arm, leg, torso): from
+# clothed_min_c and clothed_delta_c above ambient (sun-warmed clothing on a
+# body that has cooled reads several degrees above the air).
+skin_min_c = 20.0
+skin_max_c = 40.0
+warm_delta_c = 3.0
+clothed_min_c = 15.0
+clothed_delta_c = 8.0
+# A close look: readings from within close_range_m, watched for min_watch_s.
+close_range_m = 20.0
+min_watch_s = 20.0
+# Moved: a hover aimed at the casualty saw its parts move in this many frames
+# in all (the drone checks each changed outline against the picture under it).
+moved_frames = 2
+# Deteriorating: warm but cooling faster than this over at least trend_min_span.
+cooling_c_per_h = 0.5
+trend_min_span = "10m"
+# Ask for a close look when the position is less certain than this (CEP).
+max_cep_m = 5.0
+# After this many close looks that saw nothing, the casualty is "not found".
+not_found_looks = 2
+
+# Phase 4: mission-planner sends investigators to casualties that need a close look.
+[planner]
+listen = "127.0.0.1:9103"
+# Hover this high over the casualty for this long; parts within radius_m count.
+alt_agl_m = 15.0
+hover_s = 30
+radius_m = 6.0
+# A drone takes a task only if it keeps this much battery after it and the flight home.
+reserve_pct = 25.0
+# Completed looks per casualty at most.
+max_attempts = 2
+# A task with no progress for this long is given back to the queue.
+task_timeout = "4m"
+command_timeout = "3s"
+# Drones that take investigations (empty: every drone with role "investigator").
+investigators = []
+publish_interval = "5s"
+state_dir = "/var/lib/rubblesar/planner"
+
+# Phase 5: rescue-dispatch sends rescue teams to casualties (Red first, then
+# Yellow) along streets clear of rubble, and puts everything on the TAK map.
+[dispatch]
+listen = "127.0.0.1:9104"
+# Streets around the incident, from scripts/zbook/32-roads.sh ("" = /var/lib/rubblesar/roads/<incident>.json).
+roads = ""
+# Streets within this distance of a rubble spill area (from the scenario) are closed.
+block_margin_m = 1.0
+# The TAK server (taky in Docker on this ZBook, scripts/zbook/34-taky.sh); "" = no TAK map.
+tak_server = "127.0.0.1:8087"
+# rescue-dispatch's name on the TAK map and in chat; teams reply to it.
+callsign = "SAR-OPS"
+group = "Cyan"
+# Casualty markers are sent on every change and refreshed this often; a
+# marker not refreshed for marker_stale disappears from the devices.
+marker_refresh = "30s"
+marker_stale = "5m"
+drone_every = "2s"
+show_investigations = true
+# The collapsed buildings' rubble as brown shapes on the TAK map (also drawn on
+# the offline map, scripts/zbook/36-map.sh).
+show_collapses = true
+# Triage colours that get a team, most urgent first (black and grey never do;
+# thresholds await medical sign-off, decision D9).
+triage = ["red", "yellow"]
+# A team this close to its casualty has reached it. It then frees the casualty
+# from the rubble (extrication: from the scenario, how the building collapsed,
+# how deep the rubble, what shows of the person; 15 min to 6 h, a light,
+# medium or heavy rescue) and hands them over (on_scene), and is then free
+# again. A TAK team replies "done" when it has finished.
+arrive_m = 15.0
+extrication = true
+on_scene = "10m"
+# Simulated teams move this many times faster than people on foot would
+# (1 = real time), so a demo run finishes in under an hour...
+time_scale = 5.0
+# ... and free casualties this many times faster than real rescuers (a 2 h
+# heavy rescue takes 4 min of the run). Messages and markers give real times.
+rescue_time_scale = 30.0
+# A TAK team that neither answers SAR-OPS ("ok", "status") nor moves 20 m
+# towards its casualty this long after being sent loses it to another team
+# (0 = never), so a device left at a desk cannot hold a casualty up.
+tak_ack_timeout = "3m"
+# A TAK team with no position report for this long is offline (its assignment goes
+# back). ATAK reports less often while the device stands still.
+team_offline = "3m"
+# The command post: where the teams start. On the west bank of the Asi, by four
+# of the five collapses (the central bridge, Ata Köprüsü, is closed in OpenStreetMap).
+staging_lat = 36.20160
+staging_lon = 36.15850
+# A new casualty gets a team once it has been listed this long (it firms up as the scout passes).
+min_age = "10s"
+publish_interval = "5s"
+state_dir = "/var/lib/rubblesar/dispatch"
+
+# Phase 6: sar-web serves the offline incident map (scripts/zbook/36-map.sh)
+# and the after-action reports to the network (WinTAK, ATAK, a browser).
+[web]
+listen = "0.0.0.0:8090"
+root = "/var/lib/rubblesar/www"
+
+# Phase 6: the rubblesar command (up, down, status, mission, report).
+[ops]
+# The Jetson over SSH (user@address), for starting and stopping edge-eye from
+# this ZBook; scripts/zbook/38-jetson-link.sh sets it up. "" = not used.
+jetson = ""
+jetson_service = "edge-eye"
+# A mission run stops after this long if it has not finished.
+max_mission = "90m"
+
+# Rescue teams. source = "sim": simulated by rescue-dispatch (walks or drives
+# its routes); source = "tak": a person with ATAK or WinTAK whose callsign is
+# exactly this (set it in the app: Settings > Callsign). Add your own, e.g.
+#   [[dispatch.team]]
+#   id = "alpha"
+#   callsign = "ALPHA"
+#   mode = "foot"
+#   source = "tak"
+[[dispatch.team]]
+id = "team-1"
+callsign = "TEAM-1"
+mode = "foot"
+source = "sim"
+
+[[dispatch.team]]
+id = "team-2"
+callsign = "TEAM-2"
+mode = "foot"
+source = "sim"
+
+[[dispatch.team]]
+id = "team-3"
+callsign = "TEAM-3"
+mode = "vehicle"
+source = "sim"
+
+# Your WinTAK laptop (it joined the TAK server as VADER). Offline, so never
+# given work, while WinTAK is closed or reports no position; see docs/PHASE5.md,
+# "Being a team yourself". Rename it here and in WinTAK together. A device away
+# from the incident (its own GPS, or no position): add at_command_post = true
+# and the team stands at the command post whatever its device reports.
+[[dispatch.team]]
+id = "vader"
+callsign = "VADER"
+mode = "foot"
+source = "tak"
+
+# sar-check phase5 joins the TAK server as this team to test the whole loop
+# (offline, so never given work, unless sar-check or a device uses the callsign).
+[[dispatch.team]]
+id = "check-1"
+callsign = "CHECK-1"
+mode = "foot"
+source = "tak"

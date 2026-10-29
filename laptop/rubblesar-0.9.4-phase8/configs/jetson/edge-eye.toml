@@ -1,0 +1,177 @@
+# edge-eye configuration (Jetson Orin Nano)                       RubbleSAR phase 4
+# Installed to /etc/rubblesar/edge-eye.toml by scripts/jetson/30-install.sh.
+# Check it with:  edge-eye check-config --config /etc/rubblesar/edge-eye.toml
+#
+# The ZBook address is normally NOT edited here: 30-install.sh writes it to
+# /etc/rubblesar/edge-eye.env as SAR_ZENOH_CONNECT, which overrides [zenoh] connect.
+
+# Same seed = same simulated flight and sensor noise every run.
+seed = 1
+
+[site]
+# Must be identical on the Jetson and the ZBook.
+incident_id = "antakya-demo"
+# Simulated incident: central Antakya (Hatay, Türkiye), heavily damaged in the
+# 6 February 2023 earthquakes. Change both machines together to move the scenario.
+center_lat = 36.20250
+center_lon = 36.16056
+# Approximate ground height above sea level; replaced by terrain data in phase 1.
+ground_alt_msl_m = 80.0
+# Operating radius: 0.5 mile.
+radius_m = 805.0
+# Phase 1+: the simulated scenario (scenario.json + rendered layers).
+# Written by scripts/zbook/60-scenario.sh (ZBook) and 65-push-scenario.sh (Jetson).
+scenario_dir = "/var/lib/rubblesar/scenarios/antakya-demo"
+
+[zenoh]
+mode = "client"
+# The zenoh router on the ZBook. Overridden by SAR_ZENOH_CONNECT.
+connect = ["tcp/192.168.1.50:7447"]
+# Per-attempt timeout; edge-eye keeps retrying until the ZBook is reachable.
+open_timeout = "10s"
+retry_forever = true
+
+[log]
+level = "info"     # debug | info | warn | error
+format = "text"    # text | json
+
+[admin]
+# Local HTTP API used by 'edge-eye status' and 'edge-eye budget'.
+# Keep it on 127.0.0.1 unless you want other machines to change the budget.
+listen = "127.0.0.1:9101"
+
+[link]
+# Radio budget per simulated drone, kbit/s (0 = unlimited). Change at run time with:
+#   edge-eye budget --kbps 64            (all drones)
+#   edge-eye budget --kbps 32 --uav inv-1
+default_budget_kbps = 256
+
+# ---------------------------------------------------------------- perception (phase 3)
+[perception]
+# The onboard pipeline: virtual camera -> segmentation -> thermal cue ->
+# geolocation -> tracking -> detection packets.
+enabled = true
+# Model folder installed by scripts/jetson/80-engine.sh (uses model.engine, TensorRT).
+model_dir = "/var/lib/rubblesar/models/current"
+# "model", or "truth-oracle" to test the pipeline without a model (sar-check
+# phase3 does not accept runs made with the oracle).
+detector = "model"
+# Detection confidence threshold (lower finds more, with more false alarms).
+conf = 0.25
+# Camera frames per second per drone (a drone's frame_hz overrides it). The
+# Jetson renders the simulated frames itself, which costs more CPU than the
+# pipeline; 'edge-eye status' shows the rate actually reached.
+frame_hz = 1.0
+# Thermal cue: human skin band and the contrast that counts as warm, degrees C.
+# Exposed skin of a living person reads well below 37 C in cold weather.
+skin_min_c = 20.0
+skin_max_c = 40.0
+warm_delta_c = 3.0
+# A temperature reading needs this many thermal pixels on the part.
+min_thermal_px = 9
+# Warm spots with no body part seen in colour become low-confidence candidates.
+warm_spots = true
+warm_spot_min_px = 3
+# Report a part once it was seen in this many frames; updates at most this often.
+confirm_hits = 2
+update_min_interval = "5s"
+# Simulation side channel with the ground truth of every frame, for scoring on
+# the ZBook. Not part of the drones' radio budget.
+publish_truth = true
+# Scenario clock when edge-eye starts, seconds after the scenario start (09:00).
+sim_start_s = 0.0
+# Fixed downward camera.
+camera_pitch_deg = -90.0
+# Phase 4. Position error of a detection beyond the GPS and heading errors
+# (the outline, the part's extent), 1 sigma per axis, metres; added to every
+# reported CEP. 1.0 is calibrated from the phase 3 runs.
+detection_sigma_m = 1.0
+# Phase 4. Body parts are placed where the camera ray meets a surface this high
+# above the ground: the debris pile people are found on (0 = flat ground). A
+# part 3 m up seen 20 degrees off nadir would otherwise land 1.1 m too far out,
+# on the opposite side when another drone sees it from the other side.
+debris_height_m = 2.5
+# Phase 4. Movement while hovering over a casualty: a frame counts as "moved"
+# when more than movement_change of a part's outline lies more than
+# movement_tolerance_px from where it was in the hover's first frame (after
+# correcting for the drone's drift); movement needs movement_min_frames such
+# frames. 'edge-eye selftest' (ST-06) shows how a moving and a still victim
+# compare with the installed model, to set these.
+movement_change = 0.12
+movement_tolerance_px = 2
+movement_min_frames = 2
+
+[outbox]
+# Store-and-forward queue: every detection stays here until the ZBook acknowledges it.
+dir = "/var/lib/rubblesar/edge/queue"
+max_queue_mb = 200
+ack_timeout = "8s"
+max_backoff = "60s"
+# Nothing acknowledged for this long: link presumed down, send only occasional probes.
+probe_after = "20s"
+
+# ---------------------------------------------------------------- drones
+# home_offset_* is where the drone takes off, in metres east/north of the centre.
+# behaviour: survey (fly a lawnmower pattern over sites, return and land),
+#            standby (wait landed at home for investigation tasks from the
+#            ZBook's mission-planner; phase 4), orbit (circle the centre),
+#            hover (hold over home), landed.
+# Any drone takes investigation tasks: it flies there at alt_agl_m and
+# speed_mps, holds over the casualty at the task's height, then waits
+# task_loiter_s for the next task before flying home (a surveying drone goes
+# back to its survey). hover_wander_m is how much it drifts while holding.
+# survey_sites: site ids from the scenario in the order to fly (empty = all,
+# in the shortest round trip from home).
+# speed_mps is the transit speed; survey_speed_mps the speed along survey lines.
+
+[[uav]]
+id = "scout-1"
+role = "scout"
+behaviour = "survey"
+survey_sites = []
+home_offset_east_m = -50.0
+home_offset_north_m = -250.0
+alt_agl_m = 40.0
+speed_mps = 8.0
+survey_speed_mps = 5.0
+side_overlap = 0.7
+telemetry_hz = 1.0
+endurance_min = 30.0
+gps_noise_m = 1.5
+yaw_noise_deg = 1.0
+
+[[uav]]
+id = "inv-1"
+role = "investigator"
+behaviour = "standby"
+survey_sites = []
+home_offset_east_m = -30.0
+home_offset_north_m = -250.0
+alt_agl_m = 15.0
+speed_mps = 10.0
+survey_speed_mps = 2.0
+side_overlap = 0.7
+telemetry_hz = 1.0
+endurance_min = 30.0
+gps_noise_m = 1.5
+yaw_noise_deg = 1.0
+task_loiter_s = 20.0
+hover_wander_m = 0.15
+
+[[uav]]
+id = "inv-2"
+role = "investigator"
+behaviour = "standby"
+survey_sites = []
+home_offset_east_m = -10.0
+home_offset_north_m = -250.0
+alt_agl_m = 15.0
+speed_mps = 10.0
+survey_speed_mps = 2.0
+side_overlap = 0.7
+telemetry_hz = 1.0
+endurance_min = 30.0
+gps_noise_m = 1.5
+yaw_noise_deg = 1.0
+task_loiter_s = 20.0
+hover_wander_m = 0.15

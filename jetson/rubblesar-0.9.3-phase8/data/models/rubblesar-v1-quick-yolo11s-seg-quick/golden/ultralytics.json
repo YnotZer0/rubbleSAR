@@ -1,0 +1,179 @@
+{
+ "schema": 1,
+ "model": "/export/best.pt",
+ "conf": 0.25,
+ "iou": 0.6,
+ "tiles": [
+  {
+   "file": "tile-00.png",
+   "detections": []
+  },
+  {
+   "file": "tile-01.png",
+   "detections": []
+  },
+  {
+   "file": "tile-02.png",
+   "detections": [
+    {
+     "class": 0,
+     "conf": 0.2618,
+     "box": [
+      403.99,
+      592.76,
+      490.23,
+      607.57
+     ],
+     "mask_px": 968,
+     "cx": 448.52,
+     "cy": 600.35
+    }
+   ]
+  },
+  {
+   "file": "tile-03.png",
+   "detections": []
+  },
+  {
+   "file": "tile-04.png",
+   "detections": [
+    {
+     "class": 3,
+     "conf": 0.3643,
+     "box": [
+      0.6,
+      260.77,
+      417.82,
+      637.32
+     ],
+     "mask_px": 98898,
+     "cx": 201.17,
+     "cy": 493.43
+    },
+    {
+     "class": 0,
+     "conf": 0.2535,
+     "box": [
+      192.95,
+      490.09,
+      253.79,
+      502.35
+     ],
+     "mask_px": 666,
+     "cx": 223.74,
+     "cy": 496.76
+    }
+   ]
+  },
+  {
+   "file": "tile-05.png",
+   "detections": []
+  },
+  {
+   "file": "tile-06.png",
+   "detections": []
+  },
+  {
+   "file": "tile-07.png",
+   "detections": [
+    {
+     "class": 0,
+     "conf": 0.2902,
+     "box": [
+      31.09,
+      551.39,
+      106.91,
+      596.07
+     ],
+     "mask_px": 555,
+     "cx": 64.9,
+     "cy": 571.98
+    }
+   ]
+  },
+  {
+   "file": "tile-08.png",
+   "detections": [
+    {
+     "class": 0,
+     "conf": 0.2529,
+     "box": [
+      168.32,
+      450.16,
+      241.36,
+      470.85
+     ],
+     "mask_px": 693,
+     "cx": 205.58,
+     "cy": 461.12
+    }
+   ]
+  },
+  {
+   "file": "tile-09.png",
+   "detections": []
+  },
+  {
+   "file": "tile-10.png",
+   "detections": [
+    {
+     "class": 0,
+     "conf": 0.3226,
+     "box": [
+      119.62,
+      50.05,
+      257.07,
+      72.27
+     ],
+     "mask_px": 1527,
+     "cx": 180.01,
+     "cy": 59.03
+    },
+    {
+     "class": 0,
+     "conf": 0.2789,
+     "box": [
+      48.54,
+      48.32,
+      162.05,
+      81.23
+     ],
+     "mask_px": 1236,
+     "cx": 110.71,
+     "cy": 65.66
+    },
+    {
+     "class": 0,
+     "conf": 0.2678,
+     "box": [
+      199.51,
+      38.7,
+      286.87,
+      62.24
+     ],
+     "mask_px": 715,
+     "cx": 244.03,
+     "cy": 51.96
+    }
+   ]
+  },
+  {
+   "file": "tile-11.png",
+   "detections": [
+    {
+     "class": 0,
+     "conf": 0.4336,
+     "box": [
+      490.13,
+      569.23,
+      566.92,
+      595.08
+     ],
+     "mask_px": 744,
+     "cx": 532.78,
+     "cy": 581.98
+    }
+   ]
+  }
+ ]
+}

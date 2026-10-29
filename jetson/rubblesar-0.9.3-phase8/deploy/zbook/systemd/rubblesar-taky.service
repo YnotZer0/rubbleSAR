@@ -1,0 +1,22 @@
+[Unit]
+Description=RubbleSAR TAK server (taky in Docker, plain TCP 8087 for ATAK, WinTAK and rescue-dispatch)
+Documentation=file:///opt/rubblesar/docs
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Service]
+Type=simple
+ExecStartPre=-@DOCKER@ rm -f rubblesar-taky
+ExecStart=@DOCKER@ run --rm --name rubblesar-taky -p 8087:8087 --memory 512m --log-opt max-size=10m --log-opt max-file=3 @IMAGE@
+ExecStop=@DOCKER@ stop -t 10 rubblesar-taky
+Restart=always
+RestartSec=5
+# taky's XML parser slowly leaks memory: start it afresh every day
+# (TAK clients and rescue-dispatch reconnect on their own).
+RuntimeMaxSec=1d
+
+[Install]
+WantedBy=multi-user.target

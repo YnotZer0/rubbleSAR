@@ -1,0 +1,28 @@
+[Unit]
+Description=RubbleSAR rescue-dispatch (sends rescue teams to casualties, shows them on the TAK map)
+Documentation=file:///opt/rubblesar/docs
+After=network-online.target zenohd.service casualty-analyst.service rubblesar-taky.service
+Wants=network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=10
+
+[Service]
+Type=simple
+User=rubblesar
+Group=rubblesar
+Environment=RUST_LOG=error
+Environment=NO_COLOR=1
+ExecStart=/opt/rubblesar/bin/rescue-dispatch run --config /etc/rubblesar/sar.toml
+WorkingDirectory=/var/lib/rubblesar/dispatch
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+# Hardening: it needs the network, the street and scenario files (read) and its state file.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/rubblesar/dispatch
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

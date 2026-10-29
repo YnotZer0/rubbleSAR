@@ -1,0 +1,9 @@
+{
+  "engine": "model.engine",
+  "onnx_sha256": "779b358f939d3835f5838112b43cf8c3aeae3df2f9802f7b1f13b74b90d51062",
+  "tensorrt": "10.3.0",
+  "precision": "fp16",
+  "max_batch": 6,
+  "built_at": "2026-10-16T14:05:53Z",
+  "device": "NVIDIA Jetson Orin Nano Engineering Reference Developer Kit Super"
+}

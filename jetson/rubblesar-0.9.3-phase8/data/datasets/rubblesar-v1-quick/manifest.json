@@ -1,0 +1,264 @@
+{
+  "schema": 1,
+  "name": "rubblesar-v1",
+  "generator": "1.0",
+  "created": "2026-10-16T13:31:29Z",
+  "config": {
+    "Dataset": {
+      "Name": "rubblesar-v1",
+      "Seed": 100,
+      "Tile": 640,
+      "JPEGQuality": [
+        82,
+        95
+      ],
+      "BackgroundKeep": 0.15,
+      "MinInstancePx": 6,
+      "SimplifyPx": 0.7
+    },
+    "Split": {
+      "TrainScenarios": 30,
+      "ValScenarios": 6
+    },
+    "Scenarios": {
+      "BaseConfig": "../scenario/antakya-demo.toml",
+      "Sites": [
+        3,
+        4
+      ],
+      "VictimsPerSite": [
+        4,
+        7
+      ],
+      "StartHour": [
+        7.5,
+        15.5
+      ],
+      "AirMinC": [
+        -3,
+        14
+      ],
+      "AirSpanC": [
+        5,
+        14
+      ],
+      "AliveFraction": [
+        0.5,
+        0.8
+      ]
+    },
+    "Frames": {
+      "PerScenario": 80,
+      "InvestigatorShare": 0.5,
+      "ScoutShare": 0.4,
+      "InvAltM": [
+        10,
+        18
+      ],
+      "InvOffsetM": 4,
+      "ScoutAltM": [
+        30,
+        50
+      ],
+      "ScoutOffsetM": 15,
+      "PitchDeg": [
+        -90,
+        -65
+      ],
+      "TimeOffsetH": [
+        0,
+        6
+      ],
+      "NoiseSigma": [
+        1,
+        4
+      ],
+      "BlurShare": 0.25,
+      "BlurSigma": [
+        0.4,
+        1.2
+      ]
+    },
+    "Test": {
+      "Scenario": "/var/lib/rubblesar/scenarios/antakya-demo",
+      "InvAltM": 13,
+      "ScoutAltM": 40,
+      "GPSNoiseM": 1.5,
+      "AltNoiseM": 0.3,
+      "YawNoiseDeg": 1
+    }
+  },
+  "classes": [
+    "hand",
+    "arm",
+    "leg",
+    "head",
+    "torso"
+  ],
+  "splits": {
+    "test": {
+      "scenarios": 1,
+      "frames": 71,
+      "frames_by_kind": {
+        "investigator-nadir": 23,
+        "investigator-oblique": 23,
+        "scout-nadir": 20,
+        "scout-oblique": 5
+      },
+      "tiles": 426,
+      "positive_tiles": 204,
+      "instances": {
+        "arm": 277,
+        "hand": 288,
+        "head": 54,
+        "leg": 126,
+        "torso": 80
+      },
+      "instance_area_px": {
+        "16-63": 258,
+        "256-1023": 93,
+        "64-255": 228,
+        "\u003c16": 226,
+        "\u003e=1024": 20
+      }
+    },
+    "train": {
+      "scenarios": 2,
+      "frames": 60,
+      "frames_by_kind": {
+        "decoy": 3,
+        "investigator": 29,
+        "open-ground": 2,
+        "scout": 26
+      },
+      "tiles": 200,
+      "positive_tiles": 169,
+      "instances": {
+        "arm": 119,
+        "hand": 147,
+        "head": 59,
+        "leg": 189,
+        "torso": 77
+      },
+      "instance_area_px": {
+        "16-63": 220,
+        "256-1023": 65,
+        "64-255": 105,
+        "\u003c16": 183,
+        "\u003e=1024": 18
+      }
+    },
+    "val": {
+      "scenarios": 2,
+      "frames": 60,
+      "frames_by_kind": {
+        "decoy": 4,
+        "investigator": 24,
+        "open-ground": 2,
+        "scout": 30
+      },
+      "tiles": 194,
+      "positive_tiles": 151,
+      "instances": {
+        "arm": 108,
+        "hand": 176,
+        "head": 80,
+        "leg": 124,
+        "torso": 96
+      },
+      "instance_area_px": {
+        "16-63": 194,
+        "256-1023": 66,
+        "64-255": 127,
+        "\u003c16": 176,
+        "\u003e=1024": 21
+      }
+    }
+  },
+  "scenarios": {
+    "train": [
+      "ds-train-000",
+      "ds-train-001"
+    ],
+    "val": [
+      "ds-val-000",
+      "ds-val-001"
+    ]
+  },
+  "test_scenario": "antakya-demo",
+  "test_scenario_hash": "22e37148032a5d2456fe9f391f574e277573aeb473233c718d7d9404e0cf713a",
+  "test_frames": [
+    "antakya-demo-000",
+    "antakya-demo-001",
+    "antakya-demo-002",
+    "antakya-demo-003",
+    "antakya-demo-004",
+    "antakya-demo-005",
+    "antakya-demo-006",
+    "antakya-demo-007",
+    "antakya-demo-008",
+    "antakya-demo-009",
+    "antakya-demo-010",
+    "antakya-demo-011",
+    "antakya-demo-012",
+    "antakya-demo-013",
+    "antakya-demo-014",
+    "antakya-demo-015",
+    "antakya-demo-016",
+    "antakya-demo-017",
+    "antakya-demo-018",
+    "antakya-demo-019",
+    "antakya-demo-020",
+    "antakya-demo-021",
+    "antakya-demo-022",
+    "antakya-demo-023",
+    "antakya-demo-024",
+    "antakya-demo-025",
+    "antakya-demo-026",
+    "antakya-demo-027",
+    "antakya-demo-028",
+    "antakya-demo-029",
+    "antakya-demo-030",
+    "antakya-demo-031",
+    "antakya-demo-032",
+    "antakya-demo-033",
+    "antakya-demo-034",
+    "antakya-demo-035",
+    "antakya-demo-036",
+    "antakya-demo-037",
+    "antakya-demo-038",
+    "antakya-demo-039",
+    "antakya-demo-040",
+    "antakya-demo-041",
+    "antakya-demo-042",
+    "antakya-demo-043",
+    "antakya-demo-044",
+    "antakya-demo-045",
+    "antakya-demo-046",
+    "antakya-demo-047",
+    "antakya-demo-048",
+    "antakya-demo-049",
+    "antakya-demo-050",
+    "antakya-demo-051",
+    "antakya-demo-052",
+    "antakya-demo-053",
+    "antakya-demo-054",
+    "antakya-demo-055",
+    "antakya-demo-056",
+    "antakya-demo-057",
+    "antakya-demo-058",
+    "antakya-demo-059",
+    "antakya-demo-060",
+    "antakya-demo-061",
+    "antakya-demo-062",
+    "antakya-demo-063",
+    "antakya-demo-064",
+    "antakya-demo-065",
+    "antakya-demo-066",
+    "antakya-demo-067",
+    "antakya-demo-068",
+    "antakya-demo-069",
+    "antakya-demo-070"
+  ],
+  "seconds": 124
+}

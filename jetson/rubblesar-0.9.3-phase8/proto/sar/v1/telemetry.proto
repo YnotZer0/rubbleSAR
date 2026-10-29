@@ -1,0 +1,156 @@
+// Drone telemetry, published by edge-eye on the Jetson.
+// Key: sar/{incident}/uav/{uav}/telemetry   (1 Hz per drone, latest-wins)
+syntax = "proto3";
+
+package sar.v1;
+
+import "sar/v1/common.proto";
+
+option go_package = "rubblesar/internal/sarpb;sarpb";
+
+enum UavRole {
+  UAV_ROLE_UNSPECIFIED = 0;
+  UAV_ROLE_SCOUT = 1;
+  UAV_ROLE_INVESTIGATOR = 2;
+}
+
+enum FlightState {
+  FLIGHT_STATE_UNSPECIFIED = 0;
+  FLIGHT_STATE_LANDED = 1;
+  FLIGHT_STATE_TAKEOFF = 2;
+  FLIGHT_STATE_TRANSIT = 3;
+  FLIGHT_STATE_SURVEY = 4;
+  FLIGHT_STATE_INVESTIGATE = 5;
+  FLIGHT_STATE_HOVER = 6;
+  FLIGHT_STATE_RETURN = 7;
+  FLIGHT_STATE_LANDING = 8;
+}
+
+// Per-drone radio link statistics as seen by the sender.
+message LinkStats {
+  // Current budget in bits per second (0 = unlimited).
+  uint32 budget_bps = 1;
+  // Bits per second actually sent, averaged over the last 5 seconds.
+  uint32 used_bps = 2;
+  // Messages waiting in the outbound queue.
+  uint32 queued_msgs = 3;
+  // Messages dropped because the budget was exhausted (since start).
+  uint64 dropped_msgs = 4;
+  // Total bytes sent (since start).
+  uint64 sent_bytes = 5;
+  // Bytes of detections waiting to be sent or acknowledged.
+  uint64 queued_bytes = 6;
+  // Detections sent at least once but not yet acknowledged.
+  uint32 unacked_msgs = 7;
+  // 0 full detections, 1 small crops, 2 thermal crops only, 3 metadata only.
+  uint32 degrade_level = 8;
+  // A simulated outage is in progress (SetLinkOutage).
+  bool outage = 9;
+  // No acknowledgement for a while: only occasional probe packets are sent.
+  bool probing = 10;
+  // Detections acknowledged / re-sent / discarded because the queue was full (since start).
+  uint64 acked_msgs = 11;
+  uint64 resent_msgs = 12;
+  uint64 discarded_msgs = 13;
+}
+
+// Onboard perception pipeline statistics (phase 3).
+message PerceptionStats {
+  bool enabled = 1;
+  // Inference back end, e.g. "tensorrt 10.3.0 on Orin".
+  string backend = 2;
+  // Model name from model.json.
+  string model = 3;
+  float frame_hz_target = 4;
+  // Frames per second actually processed over the last 30 s.
+  float frame_hz_actual = 5;
+  uint64 frames = 6;
+  // Median milliseconds per frame over the last 30 s, by stage. Rendering the
+  // simulated frame (render_ms) is simulation cost and not part of the pipeline.
+  float render_ms = 7;
+  float segment_ms = 8;
+  float thermal_ms = 9;
+  float track_ms = 10;
+  float package_ms = 11;
+  uint32 tracks = 12;
+  // Detection packets created (NEW and UPDATE), and those that were warm spots.
+  uint64 reports = 13;
+  uint64 warm_spot_reports = 14;
+  string mission_id = 15;
+  uint32 mission_step = 16;
+  uint32 mission_steps = 17;
+  bool mission_done = 18;
+  // Scenario clock, seconds.
+  double sim_time_s = 19;
+}
+
+// Phase 4: the drone's investigation task.
+enum TaskState {
+  TASK_STATE_UNSPECIFIED = 0;
+  TASK_STATE_QUEUED = 1;      // planner: waiting for a drone
+  TASK_STATE_ASSIGNED = 2;    // planner: sent, not yet acknowledged in telemetry
+  TASK_STATE_EN_ROUTE = 3;    // flying to the target
+  TASK_STATE_ON_STATION = 4;  // holding over the target, watching
+  TASK_STATE_DONE = 5;
+  TASK_STATE_ABORTED = 6;     // replaced by another task, cancelled or low battery
+  TASK_STATE_FAILED = 7;      // planner: no progress or no drone could take it
+  TASK_STATE_CANCELLED = 8;   // planner: no longer needed
+}
+
+message TaskStatus {
+  string task_id = 1;
+  string casualty_id = 2;
+  TaskState state = 3;
+  GeoPoint target = 4;
+  float alt_agl_m = 5;
+  uint32 hover_s = 6;
+  float hover_elapsed_s = 7;
+  // Frames processed while on station.
+  uint32 frames = 8;
+  // Tracks seen within radius_m of the target while on station.
+  repeated string track_ids = 9;
+  // Any of them moved.
+  bool moved = 10;
+  // Why the task was aborted.
+  string reason = 11;
+  int64 started_unix_ns = 12;
+  int64 finished_unix_ns = 13;
+  // Closest the drone got to the target horizontally while on station, metres.
+  float offset_m = 14;
+}
+
+message Telemetry {
+  Header header = 1;
+  string uav_id = 2;
+  UavRole role = 3;
+  GeoPoint position = 4;
+  // Height above ground level at the incident site, metres.
+  float alt_agl_m = 5;
+  float roll_deg = 6;
+  float pitch_deg = 7;
+  // Heading, degrees clockwise from true north, 0..360.
+  float yaw_deg = 8;
+  float ground_speed_mps = 9;
+  float course_deg = 10;
+  float climb_mps = 11;
+  // Remaining battery, 0..100.
+  float battery_pct = 12;
+  FlightState state = 13;
+  // Estimated horizontal GPS accuracy (1 sigma), metres.
+  float gps_hacc_m = 14;
+  string mission_id = 15;
+  uint32 mission_step = 16;
+  LinkStats link = 17;
+  PerceptionStats perception = 18;
+  // Phase 4: the current task, or the last one (state DONE or ABORTED) until the next.
+  TaskStatus task = 19;
+  // Flight time left on the battery (to empty), seconds, and the cruise speed.
+  uint32 flight_time_left_s = 20;
+  float cruise_mps = 21;
+  // The drone's home (take-off and landing point).
+  GeoPoint home = 22;
+  // Phase 6: the onboard software, e.g. "edge-eye 0.7.0-phase6 (commit 1a2b3c4d)".
+  string software = 23;
+  // Phase 8 (0.9.3): a survey drone's collapse sites (scenario ids) in the order it flies them.
+  repeated string survey_sites = 24;
+}

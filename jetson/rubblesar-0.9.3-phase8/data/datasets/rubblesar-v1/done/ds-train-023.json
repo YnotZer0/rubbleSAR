@@ -1,0 +1,1 @@
+{"scenarios":1,"frames":80,"frames_by_kind":{"decoy":5,"investigator":45,"open-ground":5,"scout":25},"tiles":209,"positive_tiles":164,"instances":{"arm":135,"hand":176,"head":65,"leg":119,"torso":50},"instance_area_px":{"16-63":176,"256-1023":59,"64-255":117,"\u003c16":179,"\u003e=1024":14}}

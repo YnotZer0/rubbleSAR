@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OpenStreetMap's standard street map for ATAK and WinTAK, streamed while you look.
+     WinTAK: copy to C:\ProgramData\WinTAK\Imagery (or drag onto the map), then
+     Maps & Favorites > MOBILE > Online > OpenStreetMap.
+     Map data (c) OpenStreetMap contributors, https://www.openstreetmap.org/copyright
+     The tile server's rules (https://operations.osmfoundation.org/policies/tiles/)
+     allow viewing, not downloading areas for offline use. -->
+<customMapSource>
+    <name>OpenStreetMap</name>
+    <minZoom>0</minZoom>
+    <maxZoom>19</maxZoom>
+    <tileType>png</tileType>
+    <tileUpdate>None</tileUpdate>
+    <url><![CDATA[https://tile.openstreetmap.org/{$z}/{$x}/{$y}.png]]></url>
+    <backgroundColor>#f2efe9</backgroundColor>
+</customMapSource>
